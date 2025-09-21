@@ -1,0 +1,265 @@
+.spit-item {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.spit-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.spit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.spit-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+
+.mood-badge {
+  font-size: 1.2rem;
+  background: #f8f9fa;
+  padding: 6px 10px;
+  border-radius: 50%;
+  border: 2px solid #e9ecef;
+}
+
+.location-badge,
+.files-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #6c757d;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.timestamp {
+  color: #6c757d;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.spit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.action-btn:hover {
+  opacity: 1;
+  background: #f8f9fa;
+  transform: scale(1.1);
+}
+
+.edit-btn:hover {
+  background: #e3f2fd;
+}
+
+.delete-btn:hover {
+  background: #ffebee;
+}
+
+.spit-content {
+  margin-top: 10px;
+}
+
+.spit-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
+  margin: 0;
+  word-wrap: break-word;
+}
+
+.edit-form {
+  margin-top: 10px;
+}
+
+.edit-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+.edit-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.edit-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.save-btn,
+.cancel-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.save-btn {
+  background: #28a745;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.cancel-btn {
+  background: #6c757d;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+.spit-content-wrapper {
+  margin-top: 10px;
+}
+
+.spit-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  color: #6c757d;
+  font-size: 0.85rem;
+  border: 1px solid #e9ecef;
+}
+
+.spit-files {
+  margin-top: 15px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.files-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.files-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.file-name {
+  color: #495057;
+  font-size: 0.85rem;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-preview-btn {
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.file-preview-btn:hover {
+  background: #e9ecef;
+  color: #495057;
+}
+
+@media (max-width: 768px) {
+  .spit-item {
+    padding: 15px;
+  }
+
+  .spit-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .spit-meta {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .spit-actions {
+    align-self: flex-end;
+  }
+
+
+  .timestamp {
+    font-size: 0.8rem;
+  }
+
+  .file-name {
+    max-width: 150px;
+  }
+}

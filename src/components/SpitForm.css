@@ -1,0 +1,237 @@
+.spit-form-container {
+  margin-bottom: 40px;
+}
+
+.form-title {
+  font-size: 1.8rem;
+  color: #212529;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.spit-form {
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 25px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.spit-form:hover {
+  border-color: #6c757d;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.spit-textarea {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 120px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.spit-textarea:focus {
+  outline: none;
+  border-color: #6c757d;
+  box-shadow: 0 0 0 3px rgba(108, 117, 125, 0.1);
+}
+
+.character-count {
+  text-align: right;
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: 5px;
+}
+
+.spit-textarea::placeholder {
+  color: #6c757d;
+  font-style: italic;
+}
+
+.mood-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.mood-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 15px 10px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.mood-btn:hover {
+  border-color: #6c757d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mood-btn.selected {
+  border-color: #212529;
+  background: #f8f9fa;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.mood-emoji {
+  font-size: 1.5rem;
+}
+
+.mood-label {
+  font-weight: 500;
+  color: #495057;
+}
+
+.submit-btn {
+  width: 100%;
+  background: #212529;
+  color: white;
+  border: none;
+  padding: 15px 25px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.submit-btn:hover {
+  background: #343a40;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+.btn-icon {
+  font-size: 1.2rem;
+}
+
+.file-upload-section {
+  margin-top: 10px;
+}
+
+.file-upload-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #6c757d;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.file-upload-btn:hover {
+  background: #e9ecef;
+  border-color: #6c757d;
+  color: #495057;
+}
+
+.file-preview {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  font-size: 0.85rem;
+}
+
+.file-name {
+  color: #495057;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.remove-file-btn {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.remove-file-btn:hover {
+  background: #f8d7da;
+}
+
+
+@media (max-width: 768px) {
+  .mood-buttons {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .spit-form {
+    padding: 20px;
+  }
+
+  .form-title {
+    font-size: 1.5rem;
+  }
+
+  .file-name {
+    max-width: 100px;
+  }
+
+  .mood-btn {
+    padding: 12px 8px;
+  }
+
+  .mood-emoji {
+    font-size: 1.2rem;
+  }
+
+  .mood-label {
+    font-size: 0.8rem;
+  }
+}

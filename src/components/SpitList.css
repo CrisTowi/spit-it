@@ -1,0 +1,55 @@
+.spit-list {
+  margin-top: 30px;
+}
+
+.list-title {
+  font-size: 1.8rem;
+  color: #212529;
+  margin-bottom: 25px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.spits-container {
+  display: grid;
+  gap: 20px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty-title {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #495057;
+}
+
+.empty-message {
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .list-title {
+    font-size: 1.5rem;
+  }
+
+  .empty-state {
+    padding: 40px 20px;
+  }
+
+  .empty-icon {
+    font-size: 3rem;
+  }
+}
