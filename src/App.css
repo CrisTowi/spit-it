@@ -1,27 +1,28 @@
-.App {
+.app {
   min-height: 100vh;
-  padding: 20px;
-}
-
-.container {
   max-width: 800px;
   margin: 0 auto;
+  padding: 20px;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(10px);
-  padding: 30px;
   margin-top: 20px;
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
+.main-content {
+  margin-top: 20px;
+}
+
 @media (max-width: 768px) {
-  .App {
+  .app {
     padding: 10px;
+    margin: 10px;
+    border-radius: 15px;
   }
 
-  .container {
-    padding: 20px;
-    margin-top: 10px;
+  .main-content {
+    margin-top: 15px;
   }
 }

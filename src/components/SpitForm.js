@@ -55,7 +55,7 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
   const moodOptions = [
     { value: 'happy', emoji: '😊', label: 'Happy' },
     { value: 'neutral', emoji: '😐', label: 'Neutral' },
-    { value: 'contemplative', emoji: '🤔', label: 'Contemplative' },
+    { value: 'frustrated', emoji: '😤', label: 'Frustrated' },
     { value: 'inspired', emoji: '✨', label: 'Inspired' }
   ];
 

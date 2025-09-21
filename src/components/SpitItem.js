@@ -48,19 +48,15 @@ const SpitItem = ({ spit, onDelete, onEdit }) => {
     const icons = {
       happy: '😊',
       neutral: '😐',
-      excited: '🤩',
-      contemplative: '🤔',
-      grateful: '🙏',
-      inspired: '✨',
-      tired: '😴',
-      frustrated: '😤'
+      frustrated: '😤',
+      inspired: '✨'
     };
     return icons[mood] || '😐';
   };
 
   const getLocationString = () => {
     if (spit.location) {
-      return `${spit.location.lat.toFixed(4)}, ${spit.location.lng.toFixed(4)}`;
+      return "Location captured";
     }
     return null;
   };
