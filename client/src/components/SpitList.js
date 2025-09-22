@@ -23,7 +23,7 @@ const SpitList = ({ spits, onDeleteSpit, onEditSpit }) => {
       <div className="spits-container">
         {spits.map((spit) => (
           <SpitItem
-            key={spit.id}
+            key={spit._id}
             spit={spit}
             onDelete={onDeleteSpit}
             onEdit={onEditSpit}

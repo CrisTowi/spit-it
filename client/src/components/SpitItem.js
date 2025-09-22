@@ -8,7 +8,7 @@ const SpitItem = ({ spit, onDelete, onEdit }) => {
 
   const handleEdit = () => {
     if (isEditing) {
-      onEdit(spit.id, editContent);
+      onEdit(spit._id, editContent);
       setIsEditing(false);
     } else {
       setIsEditing(true);
@@ -22,7 +22,7 @@ const SpitItem = ({ spit, onDelete, onEdit }) => {
 
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this spit?')) {
-      onDelete(spit.id);
+      onDelete(spit._id);
     }
   };
 
