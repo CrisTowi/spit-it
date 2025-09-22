@@ -29,10 +29,12 @@ function App() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setCurrentLocation({
+          const location = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
-          });
+          };
+          console.log('Location obtained:', location);
+          setCurrentLocation(location);
         },
         (error) => {
           console.log('Location access denied or unavailable:', error);
@@ -47,6 +49,7 @@ function App() {
       timestamp: Date.now(),
       ...spitData
     };
+    console.log('Adding new spit:', newSpit);
     setSpits(prevSpits => [newSpit, ...prevSpits]);
   };
 

@@ -1,5 +1,8 @@
 import React from 'react';
 import { Calendar, MapPin, TrendingUp, Lightbulb } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import './DailySummary.css';
 
 const DailySummary = ({ todaysSpits, totalSpits }) => {
@@ -47,6 +50,21 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
     return todaysSpits.reduce((total, spit) => {
       return total + (spit.files ? spit.files.length : 0);
     }, 0);
+  };
+
+  const getMapCenter = () => {
+    const locationsWithSpits = todaysSpits.filter(spit => spit.location);
+    if (locationsWithSpits.length === 0) return [0, 0];
+
+    if (locationsWithSpits.length === 1) {
+      return [locationsWithSpits[0].location.lat, locationsWithSpits[0].location.lng];
+    }
+
+    // Calculate center point for multiple locations
+    const avgLat = locationsWithSpits.reduce((sum, spit) => sum + spit.location.lat, 0) / locationsWithSpits.length;
+    const avgLng = locationsWithSpits.reduce((sum, spit) => sum + spit.location.lng, 0) / locationsWithSpits.length;
+
+    return [avgLat, avgLng];
   };
 
   const getMostCommonMood = () => {
@@ -166,6 +184,57 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
                 {mostCommonMood.mood === 'neutral' && (
                   <p>A balanced day with steady thoughts. Sometimes neutral is exactly what we need! ⚖️</p>
                 )}
+              </div>
+            </div>
+          )}
+
+          {getLocationCount() > 0 && (
+            <div className="map-section">
+              <h3 className="map-title">
+                <MapPin size={20} />
+                Today's Locations
+              </h3>
+              <div className="map-container">
+                <MapContainer
+                  center={getMapCenter()}
+                  zoom={13}
+                  style={{ height: '300px', width: '100%' }}
+                  className="leaflet-container"
+                >
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  {todaysSpits
+                    .filter(spit => spit.location)
+                    .map((spit) => (
+                      <Marker
+                        key={spit.id}
+                        position={[spit.location.lat, spit.location.lng]}
+                        icon={L.divIcon({
+                          className: 'custom-marker',
+                          html: `<div class="marker-content">${getMoodIcon(spit.mood)}</div>`,
+                          iconSize: [30, 30],
+                          iconAnchor: [15, 15]
+                        })}
+                      >
+                        <Popup className="map-popup">
+                          <div className="popup-content">
+                            <div className="popup-header">
+                              <span className="popup-mood">{getMoodIcon(spit.mood)}</span>
+                              <span className="popup-time">{formatDate(spit.timestamp)}</span>
+                            </div>
+                            <div className="popup-text">{spit.content}</div>
+                            {spit.files && spit.files.length > 0 && (
+                              <div className="popup-files">
+                                📎 {spit.files.length} attachment{spit.files.length > 1 ? 's' : ''}
+                              </div>
+                            )}
+                          </div>
+                        </Popup>
+                      </Marker>
+                    ))}
+                </MapContainer>
               </div>
             </div>
           )}
