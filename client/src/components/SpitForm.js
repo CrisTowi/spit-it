@@ -94,10 +94,10 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
   };
 
   const moodOptions = [
-    { value: 'happy', emoji: '😊', label: 'Happy' },
+    { value: 'happy', emoji: '😊', label: 'Feliz' },
     { value: 'neutral', emoji: '😐', label: 'Neutral' },
-    { value: 'frustrated', emoji: '😤', label: 'Frustrated' },
-    { value: 'inspired', emoji: '✨', label: 'Inspired' }
+    { value: 'frustrated', emoji: '😤', label: 'Frustrado' },
+    { value: 'inspired', emoji: '✨', label: 'Inspirado' }
   ];
 
   // Location picker component
@@ -181,7 +181,7 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
       <div className="location-picker-overlay">
         <div className="location-picker-modal">
           <div className="location-picker-header">
-            <h3>Select Location</h3>
+            <h3>Seleccionar Ubicación</h3>
             <button onClick={onClose} className="close-btn">×</button>
           </div>
 
@@ -189,7 +189,7 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
             <div className="search-input-container">
               <input
                 type="text"
-                placeholder="Search for a location..."
+                placeholder="Buscar una ubicación..."
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
@@ -250,15 +250,15 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
           </div>
 
           <div className="location-picker-footer">
-            <p>Search for a location or click on the map to select</p>
+            <p>Busca una ubicación o haz clic en el mapa para seleccionar</p>
             <div className="location-picker-actions">
-              <button onClick={onClose} className="cancel-btn">Cancel</button>
+              <button onClick={onClose} className="cancel-btn">Cancelar</button>
               <button
                 onClick={handleConfirm}
                 className="confirm-btn"
                 disabled={!tempLocation}
               >
-                Confirm Location
+                Confirmar Ubicación
               </button>
             </div>
           </div>
@@ -269,13 +269,13 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
 
   return (
     <div className="spit-form-container">
-      <h2 className="form-title">What's on your mind?</h2>
+      <h2 className="form-title">¿Qué tienes en mente?</h2>
       <form onSubmit={handleSubmit} className="spit-form">
         <div className="form-group">
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="Share your thoughts, ideas, or experiences..."
+            placeholder="Comparte tus pensamientos, ideas o experiencias..."
             className="spit-textarea"
             rows="4"
             maxLength={MAX_CHARACTERS}
@@ -287,7 +287,7 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Attachments:</label>
+          <label className="form-label">Adjuntos:</label>
           <div className="file-upload-section">
             <button
               type="button"
@@ -295,7 +295,7 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
               className="file-upload-btn"
             >
               <Upload size={16} />
-              Add Files
+              Agregar Archivos
             </button>
             <input
               ref={fileInputRef}
@@ -325,7 +325,7 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
         </div>
 
         <div className="form-group">
-          <label className="form-label">How are you feeling?</label>
+          <label className="form-label">¿Cómo te sientes?</label>
           <div className="mood-buttons">
             {moodOptions.map((option) => (
               <button
@@ -342,7 +342,7 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Location:</label>
+          <label className="form-label">Ubicación:</label>
           <div className="location-controls">
             <div className="location-toggle">
               <label className="toggle-label">
@@ -351,7 +351,7 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
                   checked={useLocation}
                   onChange={(e) => handleLocationToggle(e.target.checked)}
                 />
-                <span className="toggle-text">Use current location</span>
+                <span className="toggle-text">Usar ubicación actual</span>
               </label>
             </div>
 
@@ -362,7 +362,7 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
                 className="location-picker-btn"
               >
                 <Map size={16} />
-                Select location manually
+                Seleccionar ubicación manualmente
               </button>
             </div>
           </div>
@@ -370,7 +370,7 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
           {location && (
             <div className="location-indicator">
               <MapPin size={16} />
-              <span>Location will be saved with this spit</span>
+              <span>La ubicación se guardará con este pensamiento</span>
               <button
                 type="button"
                 onClick={() => {
@@ -388,7 +388,7 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
 
         <button type="submit" className="submit-btn">
           <span className="btn-icon">💭</span>
-          Spit It Out!
+          ¡Expúlsalo!
         </button>
       </form>
 

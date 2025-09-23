@@ -10,7 +10,7 @@ const Header = () => {
           Spit It
         </h1>
         <p className="header-subtitle">
-          Capture your thoughts, ideas, and experiences
+          Captura tus pensamientos, ideas y experiencias
         </p>
       </div>
     </header>

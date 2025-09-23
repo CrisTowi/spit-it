@@ -21,7 +21,7 @@ const SpitItem = ({ spit, onDelete, onEdit }) => {
   };
 
   const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this spit?')) {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este pensamiento?')) {
       onDelete(spit._id);
     }
   };
@@ -33,11 +33,11 @@ const SpitItem = ({ spit, onDelete, onEdit }) => {
 
     if (diffInHours < 1) {
       const diffInMinutes = Math.floor((now - date) / (1000 * 60));
-      return `${diffInMinutes} minutes ago`;
+      return `hace ${diffInMinutes} minutos`;
     } else if (diffInHours < 24) {
-      return `${Math.floor(diffInHours)} hours ago`;
+      return `hace ${Math.floor(diffInHours)} horas`;
     } else if (diffInHours < 48) {
-      return 'Yesterday';
+      return 'Ayer';
     } else {
       return date.toLocaleDateString();
     }
@@ -56,7 +56,7 @@ const SpitItem = ({ spit, onDelete, onEdit }) => {
 
   const getLocationString = () => {
     if (spit.location) {
-      return "Location captured";
+      return "Ubicación capturada";
     }
     return null;
   };
@@ -83,7 +83,7 @@ const SpitItem = ({ spit, onDelete, onEdit }) => {
           {spit.location && (
             <span className="location-badge">
               <MapPin size={12} />
-              Location
+              Ubicación
             </span>
           )}
           {spit.files && spit.files.length > 0 && (
@@ -100,14 +100,14 @@ const SpitItem = ({ spit, onDelete, onEdit }) => {
           <button
             onClick={handleEdit}
             className="action-btn edit-btn"
-            title={isEditing ? "Save changes" : "Edit spit"}
+            title={isEditing ? "Guardar cambios" : "Editar pensamiento"}
           >
             {isEditing ? "💾" : "✏️"}
           </button>
           <button
             onClick={handleDelete}
             className="action-btn delete-btn"
-            title="Delete spit"
+            title="Eliminar pensamiento"
           >
             🗑️
           </button>
@@ -125,10 +125,10 @@ const SpitItem = ({ spit, onDelete, onEdit }) => {
             />
             <div className="edit-actions">
               <button onClick={handleEdit} className="save-btn">
-                Save
+                Guardar
               </button>
               <button onClick={handleCancel} className="cancel-btn">
-                Cancel
+                Cancelar
               </button>
             </div>
           </div>
@@ -147,7 +147,7 @@ const SpitItem = ({ spit, onDelete, onEdit }) => {
               <div className="spit-files">
                 <div className="files-header">
                   <Paperclip size={14} />
-                  <span>Attachments ({spit.files.length})</span>
+                  <span>Adjuntos ({spit.files.length})</span>
                 </div>
                 <div className="files-list">
                   {spit.files.map((file, index) => (
@@ -156,7 +156,7 @@ const SpitItem = ({ spit, onDelete, onEdit }) => {
                       <button
                         onClick={() => handleFilePreview(file)}
                         className="file-preview-btn"
-                        title="Preview file"
+                        title="Vista previa del archivo"
                       >
                         <Eye size={12} />
                       </button>

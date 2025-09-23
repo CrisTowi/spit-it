@@ -4,8 +4,8 @@ import './Navigation.css';
 
 const Navigation = ({ currentView, onViewChange }) => {
   const navItems = [
-    { id: 'feed', label: 'Feed', icon: Home },
-    { id: 'summary', label: 'Summary', icon: FileText }
+    { id: 'feed', label: 'Inicio', icon: Home },
+    { id: 'summary', label: 'Resumen', icon: FileText }
   ];
 
   return (

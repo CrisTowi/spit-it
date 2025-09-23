@@ -27,7 +27,7 @@ function App() {
       setSpits(response.spits || []);
     } catch (err) {
       console.error('Failed to load spits:', err);
-      setError('Failed to load spits. Please check your connection.');
+      setError('Error al cargar los pensamientos. Por favor verifica tu conexión.');
       // Fallback to localStorage if API fails
       const savedSpits = localStorage.getItem('spits');
       if (savedSpits) {
@@ -137,7 +137,7 @@ function App() {
         <Header />
         <div className="loading-container">
           <div className="loading-spinner"></div>
-          <p>Loading your spits...</p>
+          <p>Cargando tus pensamientos...</p>
         </div>
       </div>
     );
@@ -151,7 +151,7 @@ function App() {
       {error && (
         <div className="error-banner">
           <p>{error}</p>
-          <button onClick={loadSpits} className="retry-btn">Retry</button>
+          <button onClick={loadSpits} className="retry-btn">Reintentar</button>
         </div>
       )}
 

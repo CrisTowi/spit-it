@@ -27,7 +27,7 @@ router.get('/', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching spits:', error);
-    res.status(500).json({ error: 'Failed to fetch spits' });
+    res.status(500).json({ error: 'Error al obtener los pensamientos' });
   }
 });
 
@@ -51,7 +51,7 @@ router.get('/today', async (req, res) => {
     res.json({ spits: todaysSpits });
   } catch (error) {
     console.error('Error fetching today\'s spits:', error);
-    res.status(500).json({ error: 'Failed to fetch today\'s spits' });
+    res.status(500).json({ error: 'Error al obtener los pensamientos de hoy' });
   }
 });
 
@@ -91,7 +91,7 @@ router.get('/stats', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching stats:', error);
-    res.status(500).json({ error: 'Failed to fetch statistics' });
+    res.status(500).json({ error: 'Error al obtener las estadísticas' });
   }
 });
 
@@ -102,15 +102,15 @@ router.post('/', async (req, res) => {
 
     // Validation
     if (!content || content.trim().length === 0) {
-      return res.status(400).json({ error: 'Content is required' });
+      return res.status(400).json({ error: 'El contenido es requerido' });
     }
 
     if (content.length > 180) {
-      return res.status(400).json({ error: 'Content must be 180 characters or less' });
+      return res.status(400).json({ error: 'El contenido debe tener 180 caracteres o menos' });
     }
 
     if (mood && !['happy', 'neutral', 'frustrated', 'inspired'].includes(mood)) {
-      return res.status(400).json({ error: 'Invalid mood value' });
+      return res.status(400).json({ error: 'Valor de estado de ánimo inválido' });
     }
 
     const spit = new Spit({
@@ -125,7 +125,7 @@ router.post('/', async (req, res) => {
     res.status(201).json(savedSpit);
   } catch (error) {
     console.error('Error creating spit:', error);
-    res.status(500).json({ error: 'Failed to create spit' });
+    res.status(500).json({ error: 'Error al crear el pensamiento' });
   }
 });
 
@@ -136,11 +136,11 @@ router.put('/:id', async (req, res) => {
     const { content, user = 'anonymous' } = req.body;
 
     if (!content || content.trim().length === 0) {
-      return res.status(400).json({ error: 'Content is required' });
+      return res.status(400).json({ error: 'El contenido es requerido' });
     }
 
     if (content.length > 180) {
-      return res.status(400).json({ error: 'Content must be 180 characters or less' });
+      return res.status(400).json({ error: 'El contenido debe tener 180 caracteres o menos' });
     }
 
     const spit = await Spit.findOneAndUpdate(
@@ -150,13 +150,13 @@ router.put('/:id', async (req, res) => {
     );
 
     if (!spit) {
-      return res.status(404).json({ error: 'Spit not found' });
+      return res.status(404).json({ error: 'Pensamiento no encontrado' });
     }
 
     res.json(spit);
   } catch (error) {
     console.error('Error updating spit:', error);
-    res.status(500).json({ error: 'Failed to update spit' });
+    res.status(500).json({ error: 'Error al actualizar el pensamiento' });
   }
 });
 
@@ -169,13 +169,13 @@ router.delete('/:id', async (req, res) => {
     const spit = await Spit.findOneAndDelete({ _id: id, user });
 
     if (!spit) {
-      return res.status(404).json({ error: 'Spit not found' });
+      return res.status(404).json({ error: 'Pensamiento no encontrado' });
     }
 
-    res.json({ message: 'Spit deleted successfully' });
+    res.json({ message: 'Pensamiento eliminado exitosamente' });
   } catch (error) {
     console.error('Error deleting spit:', error);
-    res.status(500).json({ error: 'Failed to delete spit' });
+    res.status(500).json({ error: 'Error al eliminar el pensamiento' });
   }
 });
 

@@ -34,10 +34,10 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
 
   const getMoodLabel = (mood) => {
     const labels = {
-      happy: 'Happy',
+      happy: 'Feliz',
       neutral: 'Neutral',
-      frustrated: 'Frustrated',
-      inspired: 'Inspired'
+      frustrated: 'Frustrado',
+      inspired: 'Inspirado'
     };
     return labels[mood] || mood;
   };
@@ -78,7 +78,7 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
 
   const formatDate = () => {
     const today = new Date();
-    return today.toLocaleDateString('en-US', {
+    return today.toLocaleDateString('es-ES', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -94,7 +94,7 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
       <div className="summary-header">
         <div className="summary-title">
           <Calendar size={24} />
-          <h2>Daily Summary</h2>
+          <h2>Resumen Diario</h2>
         </div>
         <p className="summary-date">{formatDate()}</p>
       </div>
@@ -104,7 +104,7 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
           <div className="stat-icon">💭</div>
           <div className="stat-content">
             <div className="stat-number">{todaysSpits.length}</div>
-            <div className="stat-label">Today's Spits</div>
+            <div className="stat-label">Pensamientos de Hoy</div>
           </div>
         </div>
 
@@ -112,7 +112,7 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
           <div className="stat-icon">📊</div>
           <div className="stat-content">
             <div className="stat-number">{totalSpits}</div>
-            <div className="stat-label">Total Spits</div>
+            <div className="stat-label">Total de Pensamientos</div>
           </div>
         </div>
 
@@ -120,7 +120,7 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
           <div className="stat-icon">📍</div>
           <div className="stat-content">
             <div className="stat-number">{getLocationCount()}</div>
-            <div className="stat-label">With Location</div>
+            <div className="stat-label">Con Ubicación</div>
           </div>
         </div>
 
@@ -128,7 +128,7 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
           <div className="stat-icon">📎</div>
           <div className="stat-content">
             <div className="stat-number">{getAttachmentCount()}</div>
-            <div className="stat-label">Attachments</div>
+            <div className="stat-label">Adjuntos</div>
           </div>
         </div>
       </div>
@@ -139,7 +139,7 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
             <div className="mood-analysis">
               <h3 className="analysis-title">
                 <TrendingUp size={20} />
-                Mood Analysis
+                Análisis de Estado de Ánimo
               </h3>
               <div className="mood-stats">
                 {moodStats.map(({ mood, count, percentage }) => (
@@ -165,24 +165,24 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
             <div className="insights">
               <h3 className="insights-title">
                 <Lightbulb size={20} />
-                Today's Insight
+                Perspectiva de Hoy
               </h3>
               <div className="insight-content">
                 <p>
-                  Your most common mood today was <strong>{getMoodLabel(mostCommonMood.mood)}</strong>
-                  {' '}{getMoodIcon(mostCommonMood.mood)} with {mostCommonMood.count} spits.
+                  Tu estado de ánimo más común hoy fue <strong>{getMoodLabel(mostCommonMood.mood)}</strong>
+                  {' '}{getMoodIcon(mostCommonMood.mood)} con {mostCommonMood.count} pensamientos.
                 </p>
                 {mostCommonMood.mood === 'happy' && (
-                  <p>It looks like you had a positive day! Keep spreading that joy! ✨</p>
+                  <p>¡Parece que tuviste un día positivo! ¡Sigue compartiendo esa alegría! ✨</p>
                 )}
                 {mostCommonMood.mood === 'frustrated' && (
-                  <p>It seems like you had some challenges today. Remember, it's okay to feel frustrated - tomorrow is a new opportunity! 💪</p>
+                  <p>Parece que tuviste algunos desafíos hoy. Recuerda, está bien sentirse frustrado - ¡mañana es una nueva oportunidad! 💪</p>
                 )}
                 {mostCommonMood.mood === 'inspired' && (
-                  <p>What an inspiring day! Your creativity and motivation are shining through! 🌟</p>
+                  <p>¡Qué día tan inspirador! ¡Tu creatividad y motivación están brillando! 🌟</p>
                 )}
                 {mostCommonMood.mood === 'neutral' && (
-                  <p>A balanced day with steady thoughts. Sometimes neutral is exactly what we need! ⚖️</p>
+                  <p>Un día equilibrado con pensamientos constantes. ¡A veces neutral es exactamente lo que necesitamos! ⚖️</p>
                 )}
               </div>
             </div>
@@ -192,7 +192,7 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
             <div className="map-section">
               <h3 className="map-title">
                 <MapPin size={20} />
-                Today's Locations
+                Ubicaciones de Hoy
               </h3>
               <div className="map-container">
                 <MapContainer
@@ -240,7 +240,7 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
           )}
 
           <div className="recent-spits">
-            <h3 className="recent-title">Today's Spits</h3>
+            <h3 className="recent-title">Pensamientos de Hoy</h3>
             <div className="recent-list">
               {todaysSpits.slice(0, 3).map((spit) => (
                 <div key={spit.id} className="recent-spit">
@@ -262,8 +262,8 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
       ) : (
         <div className="empty-summary">
           <div className="empty-icon">📝</div>
-          <h3>No spits today yet!</h3>
-          <p>Start your day by sharing your first thought in the Feed tab.</p>
+          <h3>¡Aún no hay pensamientos hoy!</h3>
+          <p>Comienza tu día compartiendo tu primer pensamiento en la pestaña de Inicio.</p>
         </div>
       )}
     </div>
