@@ -7,9 +7,9 @@ const SpitList = ({ spits, onDeleteSpit, onEditSpit }) => {
     return (
       <div className="empty-state">
         <div className="empty-icon">💭</div>
-        <h3 className="empty-title">¡Aún no hay pensamientos!</h3>
+        <h3 className="empty-title">¡Aún no hay spits!</h3>
         <p className="empty-message">
-          Comienza a compartir tus pensamientos, ideas y experiencias arriba.
+          Comienza a compartir tus spits, ideas y experiencias arriba.
         </p>
       </div>
     );
@@ -18,7 +18,7 @@ const SpitList = ({ spits, onDeleteSpit, onEditSpit }) => {
   return (
     <div className="spit-list">
       <h2 className="list-title">
-        Tus Pensamientos ({spits.length})
+        Tus Spits ({spits.length})
       </h2>
       <div className="spits-container">
         {spits.map((spit) => (

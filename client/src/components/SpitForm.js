@@ -13,6 +13,13 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
   const [useLocation, setUseLocation] = useState(false);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [noResultsFound, setNoResultsFound] = useState(false);
+  const [mapCenter, setMapCenter] = useState(currentLocation ? [currentLocation.lat, currentLocation.lng] : [40.7128, -74.0060]);
+  const [mapZoom, setMapZoom] = useState(currentLocation ? 15 : 10);
+  const searchTimeoutRef = useRef(null);
   const fileInputRef = useRef(null);
   const MAX_CHARACTERS = 180;
 
@@ -49,6 +56,9 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
       setUseLocation(false);
       setSelectedLocation(null);
       setShowLocationPicker(false);
+      setSearchQuery('');
+      setSearchResults([]);
+      setNoResultsFound(false);
     }
   };
 
@@ -70,6 +80,101 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
 
   const handleLocationPickerToggle = () => {
     setShowLocationPicker(!showLocationPicker);
+    if (!showLocationPicker) {
+      // Reset search when opening
+      setSearchQuery('');
+      setSearchResults([]);
+      setNoResultsFound(false);
+    }
+  };
+
+  const handleSearch = async (query) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setNoResultsFound(false);
+      return;
+    }
+
+    setIsSearching(true);
+    setNoResultsFound(false);
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`
+      );
+      const results = await response.json();
+      setSearchResults(results);
+      setNoResultsFound(results.length === 0);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+      setNoResultsFound(true);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const debouncedSearch = (query) => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      handleSearch(query);
+    }, 500);
+  };
+
+  const handleSearchResultClick = (result) => {
+    const lat = parseFloat(result.lat);
+    const lng = parseFloat(result.lon);
+    setSelectedLocation({ lat, lng });
+    setLocation({ lat, lng });
+    setMapCenter([lat, lng]);
+    setMapZoom(15);
+    setSearchQuery(result.display_name);
+    setSearchResults([]);
+    setNoResultsFound(false);
+  };
+
+  const handleEnterSearch = async () => {
+    if (!searchQuery.trim()) return;
+
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    await handleSearch(searchQuery);
+    setSearchResults([]);
+    setNoResultsFound(false);
+
+    if (searchResults.length > 0) {
+      const firstResult = searchResults[0];
+      const lat = parseFloat(firstResult.lat);
+      const lng = parseFloat(firstResult.lon);
+      setMapCenter([lat, lng]);
+      setMapZoom(15);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleEnterSearch();
+    }
+  };
+
+  const closeSearchOptions = () => {
+    setSearchResults([]);
+    setNoResultsFound(false);
+  };
+
+  const MapClickHandler = () => {
+    useMapEvents({
+      click: (e) => {
+        const { lat, lng } = e.latlng;
+        setSelectedLocation({ lat, lng });
+        setLocation({ lat, lng });
+      },
+    });
+    return null;
   };
 
   const handleFileUpload = (e) => {
@@ -100,172 +205,6 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
     { value: 'inspired', emoji: '✨', label: 'Inspirado' }
   ];
 
-  // Location picker component
-  const LocationPicker = ({ onLocationSelect, onClose }) => {
-    const [tempLocation, setTempLocation] = useState(null);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
-    const [isSearching, setIsSearching] = useState(false);
-    const [mapCenter, setMapCenter] = useState([40.7128, -74.0060]);
-    const searchTimeoutRef = useRef(null);
-
-    const MapClickHandler = () => {
-      useMapEvents({
-        click: (e) => {
-          const { lat, lng } = e.latlng;
-          setTempLocation({ lat, lng });
-        },
-      });
-      return null;
-    };
-
-    const handleSearch = async (query) => {
-      if (!query.trim()) {
-        setSearchResults([]);
-        return;
-      }
-
-      setIsSearching(true);
-      try {
-        // Using Nominatim (OpenStreetMap) geocoding service
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`
-        );
-        const results = await response.json();
-        setSearchResults(results);
-      } catch (error) {
-        console.error('Search error:', error);
-        setSearchResults([]);
-      } finally {
-        setIsSearching(false);
-      }
-    };
-
-    const debouncedSearch = (query) => {
-      // Clear existing timeout
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
-
-      // Set new timeout for 1 second
-      searchTimeoutRef.current = setTimeout(() => {
-        handleSearch(query);
-      }, 1000);
-    };
-
-    const handleSearchResultClick = (result) => {
-      const lat = parseFloat(result.lat);
-      const lng = parseFloat(result.lon);
-      setTempLocation({ lat, lng });
-      setMapCenter([lat, lng]);
-      setSearchQuery(result.display_name);
-      setSearchResults([]);
-    };
-
-    const handleConfirm = () => {
-      if (tempLocation) {
-        onLocationSelect(tempLocation.lat, tempLocation.lng);
-      }
-    };
-
-    // Cleanup timeout on unmount
-    useEffect(() => {
-      return () => {
-        if (searchTimeoutRef.current) {
-          clearTimeout(searchTimeoutRef.current);
-        }
-      };
-    }, []);
-
-    return (
-      <div className="location-picker-overlay">
-        <div className="location-picker-modal">
-          <div className="location-picker-header">
-            <h3>Seleccionar Ubicación</h3>
-            <button onClick={onClose} className="close-btn">×</button>
-          </div>
-
-          <div className="location-search-section">
-            <div className="search-input-container">
-              <input
-                type="text"
-                placeholder="Buscar una ubicación..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  debouncedSearch(e.target.value);
-                }}
-                className="location-search-input"
-              />
-              {isSearching && <div className="search-spinner"></div>}
-            </div>
-          </div>
-
-          <div className="location-picker-map-container">
-            <div className="location-picker-map">
-              <MapContainer
-                center={mapCenter}
-                zoom={10}
-                style={{ height: '300px', width: '100%' }}
-                key={`${mapCenter[0]}-${mapCenter[1]}`} // Force re-render when center changes
-              >
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                />
-                <MapClickHandler />
-                {tempLocation && (
-                  <Marker
-                    position={[tempLocation.lat, tempLocation.lng]}
-                    icon={L.divIcon({
-                      className: 'temp-marker',
-                      html: '<div class="temp-marker-content">📍</div>',
-                      iconSize: [30, 30],
-                      iconAnchor: [15, 15]
-                    })}
-                  />
-                )}
-              </MapContainer>
-            </div>
-
-            {searchResults.length > 0 && (
-              <div className="search-results-floating">
-                {searchResults.map((result, index) => (
-                  <div
-                    key={index}
-                    className="search-result-item"
-                    onClick={() => handleSearchResultClick(result)}
-                  >
-                    <div className="search-result-name">{result.display_name}</div>
-                    {result.address && (
-                      <div className="search-result-address">
-                        {result.address.city || result.address.town || result.address.village || ''}
-                        {result.address.country && `, ${result.address.country}`}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="location-picker-footer">
-            <p>Busca una ubicación o haz clic en el mapa para seleccionar</p>
-            <div className="location-picker-actions">
-              <button onClick={onClose} className="cancel-btn">Cancelar</button>
-              <button
-                onClick={handleConfirm}
-                className="confirm-btn"
-                disabled={!tempLocation}
-              >
-                Confirmar Ubicación
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="spit-form-container">
@@ -362,21 +301,122 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
                 className="location-picker-btn"
               >
                 <Map size={16} />
-                Seleccionar ubicación manualmente
+                {showLocationPicker ? 'Ocultar mapa' : 'Seleccionar ubicación manualmente'}
               </button>
             </div>
           </div>
 
+          {showLocationPicker && (
+            <div className="inline-location-picker">
+              <div className="location-search-section">
+                <div className="search-input-container">
+                  <input
+                    type="text"
+                    placeholder="Buscar una ubicación..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      debouncedSearch(e.target.value);
+                    }}
+                    onKeyPress={handleKeyPress}
+                    className="location-search-input"
+                  />
+                  {isSearching && <div className="search-spinner"></div>}
+                </div>
+              </div>
+
+              <div className="inline-map-container">
+                <div className="inline-map">
+                  <MapContainer
+                    center={mapCenter}
+                    zoom={mapZoom}
+                    style={{ height: '250px', width: '100%' }}
+                    key={`${mapCenter[0]}-${mapCenter[1]}-${mapZoom}`}
+                  >
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    />
+                    <MapClickHandler />
+                    {selectedLocation && (
+                      <Marker
+                        position={[selectedLocation.lat, selectedLocation.lng]}
+                        icon={L.divIcon({
+                          className: 'temp-marker',
+                          html: '<div class="temp-marker-content">📍</div>',
+                          iconSize: [30, 30],
+                          iconAnchor: [15, 15]
+                        })}
+                      />
+                    )}
+                  </MapContainer>
+                </div>
+
+                {searchResults.length > 0 && (
+                  <div className="search-results-floating">
+                    <div className="search-results-header">
+                      <span>Resultados de búsqueda</span>
+                      <button
+                        onClick={closeSearchOptions}
+                        className="close-search-btn"
+                        title="Cerrar resultados"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    {searchResults.map((result, index) => (
+                      <div
+                        key={index}
+                        className="search-result-item"
+                        onClick={() => handleSearchResultClick(result)}
+                      >
+                        <div className="search-result-name">{result.display_name}</div>
+                        {result.address && (
+                          <div className="search-result-address">
+                            {result.address.city || result.address.town || result.address.village || ''}
+                            {result.address.country && `, ${result.address.country}`}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {noResultsFound && searchQuery.trim() && !isSearching && (
+                  <div className="no-results-message">
+                    <div className="no-results-header">
+                      <span>Sin resultados</span>
+                      <button
+                        onClick={closeSearchOptions}
+                        className="close-search-btn"
+                        title="Cerrar mensaje"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <p>No se encontraron ubicaciones para "{searchQuery}"</p>
+                    <p className="no-results-hint">Presiona Enter para centrar el mapa en tu búsqueda y selecciona manualmente</p>
+                  </div>
+                )}
+              </div>
+
+              <p className="map-instructions">Busca una ubicación, presiona Enter para centrar el mapa, o haz clic en el mapa para seleccionar</p>
+            </div>
+          )}
+
           {location && (
             <div className="location-indicator">
               <MapPin size={16} />
-              <span>La ubicación se guardará con este pensamiento</span>
+              <span>La ubicación se guardará con este spit</span>
               <button
                 type="button"
                 onClick={() => {
                   setLocation(null);
                   setUseLocation(false);
                   setSelectedLocation(null);
+                  setSearchQuery('');
+                  setSearchResults([]);
+                  setNoResultsFound(false);
                 }}
                 className="remove-location-btn"
               >
@@ -392,12 +432,6 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
         </button>
       </form>
 
-      {showLocationPicker && (
-        <LocationPicker
-          onLocationSelect={handleManualLocationSelect}
-          onClose={handleLocationPickerToggle}
-        />
-      )}
     </div>
   );
 };

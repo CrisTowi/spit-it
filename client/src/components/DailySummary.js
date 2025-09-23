@@ -104,7 +104,7 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
           <div className="stat-icon">💭</div>
           <div className="stat-content">
             <div className="stat-number">{todaysSpits.length}</div>
-            <div className="stat-label">Pensamientos de Hoy</div>
+            <div className="stat-label">Spits de Hoy</div>
           </div>
         </div>
 
@@ -112,7 +112,7 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
           <div className="stat-icon">📊</div>
           <div className="stat-content">
             <div className="stat-number">{totalSpits}</div>
-            <div className="stat-label">Total de Pensamientos</div>
+            <div className="stat-label">Total de Spits</div>
           </div>
         </div>
 
@@ -170,7 +170,7 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
               <div className="insight-content">
                 <p>
                   Tu estado de ánimo más común hoy fue <strong>{getMoodLabel(mostCommonMood.mood)}</strong>
-                  {' '}{getMoodIcon(mostCommonMood.mood)} con {mostCommonMood.count} pensamientos.
+                  {' '}{getMoodIcon(mostCommonMood.mood)} con {mostCommonMood.count} spits.
                 </p>
                 {mostCommonMood.mood === 'happy' && (
                   <p>¡Parece que tuviste un día positivo! ¡Sigue compartiendo esa alegría! ✨</p>
@@ -240,7 +240,7 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
           )}
 
           <div className="recent-spits">
-            <h3 className="recent-title">Pensamientos de Hoy</h3>
+            <h3 className="recent-title">Spits de Hoy</h3>
             <div className="recent-list">
               {todaysSpits.slice(0, 3).map((spit) => (
                 <div key={spit.id} className="recent-spit">
@@ -262,8 +262,8 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
       ) : (
         <div className="empty-summary">
           <div className="empty-icon">📝</div>
-          <h3>¡Aún no hay pensamientos hoy!</h3>
-          <p>Comienza tu día compartiendo tu primer pensamiento en la pestaña de Inicio.</p>
+          <h3>¡Aún no hay spits hoy!</h3>
+          <p>Comienza tu día compartiendo tu primer spit en la pestaña de Inicio.</p>
         </div>
       )}
     </div>

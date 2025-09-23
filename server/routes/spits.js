@@ -27,7 +27,7 @@ router.get('/', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching spits:', error);
-    res.status(500).json({ error: 'Error al obtener los pensamientos' });
+    res.status(500).json({ error: 'Error al obtener los spits' });
   }
 });
 
@@ -51,7 +51,7 @@ router.get('/today', async (req, res) => {
     res.json({ spits: todaysSpits });
   } catch (error) {
     console.error('Error fetching today\'s spits:', error);
-    res.status(500).json({ error: 'Error al obtener los pensamientos de hoy' });
+    res.status(500).json({ error: 'Error al obtener los spits de hoy' });
   }
 });
 
@@ -125,7 +125,7 @@ router.post('/', async (req, res) => {
     res.status(201).json(savedSpit);
   } catch (error) {
     console.error('Error creating spit:', error);
-    res.status(500).json({ error: 'Error al crear el pensamiento' });
+    res.status(500).json({ error: 'Error al crear el spit' });
   }
 });
 
@@ -150,13 +150,13 @@ router.put('/:id', async (req, res) => {
     );
 
     if (!spit) {
-      return res.status(404).json({ error: 'Pensamiento no encontrado' });
+      return res.status(404).json({ error: 'Spit no encontrado' });
     }
 
     res.json(spit);
   } catch (error) {
     console.error('Error updating spit:', error);
-    res.status(500).json({ error: 'Error al actualizar el pensamiento' });
+    res.status(500).json({ error: 'Error al actualizar el spit' });
   }
 });
 
@@ -169,13 +169,13 @@ router.delete('/:id', async (req, res) => {
     const spit = await Spit.findOneAndDelete({ _id: id, user });
 
     if (!spit) {
-      return res.status(404).json({ error: 'Pensamiento no encontrado' });
+      return res.status(404).json({ error: 'Spit no encontrado' });
     }
 
-    res.json({ message: 'Pensamiento eliminado exitosamente' });
+    res.json({ message: 'Spit eliminado exitosamente' });
   } catch (error) {
     console.error('Error deleting spit:', error);
-    res.status(500).json({ error: 'Error al eliminar el pensamiento' });
+    res.status(500).json({ error: 'Error al eliminar el spit' });
   }
 });
 

@@ -21,7 +21,7 @@ const SpitItem = ({ spit, onDelete, onEdit }) => {
   };
 
   const handleDelete = () => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este pensamiento?')) {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este spit?')) {
       onDelete(spit._id);
     }
   };
@@ -100,14 +100,14 @@ const SpitItem = ({ spit, onDelete, onEdit }) => {
           <button
             onClick={handleEdit}
             className="action-btn edit-btn"
-            title={isEditing ? "Guardar cambios" : "Editar pensamiento"}
+            title={isEditing ? "Guardar cambios" : "Editar spit"}
           >
             {isEditing ? "💾" : "✏️"}
           </button>
           <button
             onClick={handleDelete}
             className="action-btn delete-btn"
-            title="Eliminar pensamiento"
+            title="Eliminar spit"
           >
             🗑️
           </button>

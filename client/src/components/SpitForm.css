@@ -302,7 +302,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 9999;
   padding: 20px;
 }
 
@@ -400,7 +400,7 @@
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 9999;
   max-height: 200px;
   overflow-y: auto;
   border: 1px solid #e9ecef;
@@ -408,6 +408,35 @@
   background: white;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   margin: 10px;
+}
+
+.search-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.close-search-btn {
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.close-search-btn:hover {
+  background: #e9ecef;
+  color: #495057;
 }
 
 .search-result-item {
@@ -437,6 +466,52 @@
   font-size: 0.8rem;
   color: #6c757d;
   line-height: 1.2;
+}
+
+.no-results-message {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin: 10px;
+  text-align: center;
+}
+
+.no-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.no-results-message p {
+  margin: 0 0 8px 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+  padding: 15px;
+}
+
+.no-results-message p:first-child {
+  color: #dc3545;
+  font-weight: 500;
+}
+
+.no-results-hint {
+  font-size: 0.8rem !important;
+  color: #6c757d !important;
+  font-style: italic;
 }
 
 .location-picker-map {
@@ -582,4 +657,38 @@
   .confirm-btn {
     width: 100%;
   }
+}
+
+/* Inline Location Picker */
+.inline-location-picker {
+  margin-top: 15px;
+  padding: 20px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+}
+
+.inline-location-picker .location-search-section {
+  margin-bottom: 15px;
+  padding: 0;
+  border-bottom: none;
+}
+
+.inline-map-container {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.inline-map {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e9ecef;
+}
+
+.map-instructions {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.8rem;
+  text-align: center;
+  font-style: italic;
 }
