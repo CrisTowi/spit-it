@@ -34,17 +34,22 @@ router.get('/', async (req, res) => {
 // GET /api/spits/today - Get today's spits
 router.get('/today', async (req, res) => {
   try {
-    const { user = 'anonymous' } = req.query;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    const { user = 'anonymous', timezone = 'UTC' } = req.query;
+
+    // Get today's date in the user's timezone
+    const now = new Date();
+    const userToday = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+    userToday.setHours(0, 0, 0, 0);
+
+    // Convert to UTC for database query
+    const todayUTC = new Date(userToday.getTime() - (userToday.getTimezoneOffset() * 60000));
+    const tomorrowUTC = new Date(todayUTC.getTime() + (24 * 60 * 60 * 1000));
 
     const todaysSpits = await Spit.find({
       user,
       timestamp: {
-        $gte: today,
-        $lt: tomorrow
+        $gte: todayUTC,
+        $lt: tomorrowUTC
       }
     }).sort({ timestamp: -1 }).lean();
 
@@ -58,18 +63,22 @@ router.get('/today', async (req, res) => {
 // GET /api/spits/stats - Get statistics
 router.get('/stats', async (req, res) => {
   try {
-    const { user = 'anonymous' } = req.query;
+    const { user = 'anonymous', timezone = 'UTC' } = req.query;
 
     const totalSpits = await Spit.countDocuments({ user });
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // Get today's date in the user's timezone
+    const now = new Date();
+    const userToday = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+    userToday.setHours(0, 0, 0, 0);
+
+    // Convert to UTC for database query
+    const todayUTC = new Date(userToday.getTime() - (userToday.getTimezoneOffset() * 60000));
+    const tomorrowUTC = new Date(todayUTC.getTime() + (24 * 60 * 60 * 1000));
 
     const todaysSpits = await Spit.countDocuments({
       user,
-      timestamp: { $gte: today, $lt: tomorrow }
+      timestamp: { $gte: todayUTC, $lt: tomorrowUTC }
     });
 
     const locationCount = await Spit.countDocuments({

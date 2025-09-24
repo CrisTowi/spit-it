@@ -31,6 +31,10 @@ const dailySummarySchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  timezone: {
+    type: String,
+    default: 'UTC'
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -43,29 +47,41 @@ const dailySummarySchema = new mongoose.Schema({
 dailySummarySchema.index({ date: 1, user: 1 }, { unique: true });
 
 // Static method to get today's summary for a user
-dailySummarySchema.statics.getTodaysSummary = function (user = 'anonymous') {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
+dailySummarySchema.statics.getTodaysSummary = function (user = 'anonymous', timezone = 'UTC') {
+  // Get today's date in the user's timezone
+  const now = new Date();
+  const userToday = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+  userToday.setHours(0, 0, 0, 0);
+
+  // Convert to UTC for database query
+  const todayUTC = new Date(userToday.getTime() - (userToday.getTimezoneOffset() * 60000));
+  const tomorrowUTC = new Date(todayUTC.getTime() + (24 * 60 * 60 * 1000));
 
   return this.findOne({
     user,
     date: {
-      $gte: today,
-      $lt: tomorrow
+      $gte: todayUTC,
+      $lt: tomorrowUTC
     }
   });
 };
 
 // Static method to create today's summary
 dailySummarySchema.statics.createTodaysSummary = function (summaryData) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const { timezone = 'UTC', ...data } = summaryData;
+
+  // Get today's date in the user's timezone
+  const now = new Date();
+  const userToday = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+  userToday.setHours(0, 0, 0, 0);
+
+  // Convert to UTC for database storage
+  const todayUTC = new Date(userToday.getTime() - (userToday.getTimezoneOffset() * 60000));
 
   return this.create({
-    ...summaryData,
-    date: today
+    ...data,
+    date: todayUTC,
+    timezone
   });
 };
 

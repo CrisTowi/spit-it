@@ -8,8 +8,8 @@ const Spit = require('../models/Spit');
 // GET /api/summaries/today - Get today's summary
 router.get('/today', async (req, res) => {
   try {
-    const { user = 'anonymous' } = req.query;
-    const summary = await DailySummary.getTodaysSummary(user);
+    const { user = 'anonymous', timezone = 'UTC' } = req.query;
+    const summary = await DailySummary.getTodaysSummary(user, timezone);
 
     if (!summary) {
       return res.json({ summary: null });
@@ -25,10 +25,10 @@ router.get('/today', async (req, res) => {
 // POST /api/summaries/generate - Generate today's summary
 router.post('/generate', async (req, res) => {
   try {
-    const { user = 'anonymous' } = req.body;
+    const { user = 'anonymous', timezone = 'UTC' } = req.body;
 
     // Check if summary already exists for today
-    const existingSummary = await DailySummary.getTodaysSummary(user);
+    const existingSummary = await DailySummary.getTodaysSummary(user, timezone);
     if (existingSummary) {
       return res.status(400).json({
         error: 'Ya se ha generado un resumen para hoy',
@@ -36,17 +36,20 @@ router.post('/generate', async (req, res) => {
       });
     }
 
-    // Get today's spits
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // Get today's spits in user's timezone
+    const now = new Date();
+    const userToday = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+    userToday.setHours(0, 0, 0, 0);
+
+    // Convert to UTC for database query
+    const todayUTC = new Date(userToday.getTime() - (userToday.getTimezoneOffset() * 60000));
+    const tomorrowUTC = new Date(todayUTC.getTime() + (24 * 60 * 60 * 1000));
 
     const todaysSpits = await Spit.find({
       user,
       timestamp: {
-        $gte: today,
-        $lt: tomorrow
+        $gte: todayUTC,
+        $lt: tomorrowUTC
       }
     }).sort({ timestamp: 1 }).lean();
 
@@ -122,7 +125,8 @@ Resumen:`,
       spitsCount: totalSpits,
       moodAnalysis: moodStats,
       locationCount,
-      attachmentCount
+      attachmentCount,
+      timezone
     });
 
     res.json({ summary });

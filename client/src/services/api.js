@@ -32,11 +32,13 @@ class ApiService {
   }
 
   async getTodaysSpits(user = 'anonymous') {
-    return this.request(`/spits/today?user=${user}`);
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return this.request(`/spits/today?user=${user}&timezone=${encodeURIComponent(timezone)}`);
   }
 
   async getStats(user = 'anonymous') {
-    return this.request(`/spits/stats?user=${user}`);
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return this.request(`/spits/stats?user=${user}&timezone=${encodeURIComponent(timezone)}`);
   }
 
   async createSpit(spitData, user = 'anonymous') {
@@ -61,13 +63,15 @@ class ApiService {
 
   // Summaries API
   async getTodaysSummary(user = 'anonymous') {
-    return this.request(`/summaries/today?user=${user}`);
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return this.request(`/summaries/today?user=${user}&timezone=${encodeURIComponent(timezone)}`);
   }
 
   async generateSummary(user = 'anonymous') {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     return this.request('/summaries/generate', {
       method: 'POST',
-      body: JSON.stringify({ user }),
+      body: JSON.stringify({ user, timezone }),
     });
   }
 
