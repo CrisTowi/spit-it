@@ -31,6 +31,28 @@ const dailySummarySchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  summarizedSpits: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Spit'
+  }],
+  locations: [{
+    lat: {
+      type: Number,
+      required: true,
+      min: -90,
+      max: 90
+    },
+    lng: {
+      type: Number,
+      required: true,
+      min: -180,
+      max: 180
+    },
+    spitId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Spit'
+    }
+  }],
   timezone: {
     type: String,
     default: 'UTC'
@@ -83,6 +105,15 @@ dailySummarySchema.statics.createTodaysSummary = function (summaryData) {
     date: todayUTC,
     timezone
   });
+};
+
+// Static method to get all summaries for a user (for timeline)
+dailySummarySchema.statics.getAllSummaries = function (user = 'anonymous', limit = 30) {
+  return this.find({ user })
+    .sort({ date: -1 })
+    .limit(limit)
+    .populate('summarizedSpits', 'content mood timestamp location')
+    .lean();
 };
 
 module.exports = mongoose.model('DailySummary', dailySummarySchema);

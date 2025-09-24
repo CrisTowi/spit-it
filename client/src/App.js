@@ -4,6 +4,7 @@ import Navigation from './components/Navigation';
 import SpitForm from './components/SpitForm';
 import SpitList from './components/SpitList';
 import DailySummary from './components/DailySummary';
+import SummaryTimeline from './components/SummaryTimeline';
 import apiService from './services/api';
 import './App.css';
 
@@ -86,6 +87,10 @@ function App() {
       localStorage.setItem('spits', JSON.stringify(updatedSpits));
     } catch (err) {
       console.error('Failed to delete spit:', err);
+      if (err.message.includes('resumen de IA')) {
+        alert('No se puede eliminar un spit que ya ha sido incluido en un resumen de IA');
+        return;
+      }
       // Fallback to localStorage
       setSpits(prevSpits => prevSpits.filter(spit => spit._id !== spitId));
       const updatedSpits = spits.filter(spit => spit._id !== spitId);
@@ -108,6 +113,10 @@ function App() {
       localStorage.setItem('spits', JSON.stringify(updatedSpits));
     } catch (err) {
       console.error('Failed to update spit:', err);
+      if (err.message.includes('resumen de IA')) {
+        alert('No se puede editar un spit que ya ha sido incluido en un resumen de IA');
+        return;
+      }
       // Fallback to localStorage
       setSpits(prevSpits =>
         prevSpits.map(spit =>
@@ -172,6 +181,10 @@ function App() {
             todaysSpits={getTodaysSpits()}
             totalSpits={spits.length}
           />
+        )}
+
+        {currentView === 'timeline' && (
+          <SummaryTimeline />
         )}
       </main>
     </div>

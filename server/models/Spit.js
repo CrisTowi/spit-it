@@ -56,6 +56,10 @@ const spitSchema = new mongoose.Schema({
   user: {
     type: String,
     default: 'anonymous' // For now, we'll use anonymous users
+  },
+  isSummarized: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true // Adds createdAt and updatedAt

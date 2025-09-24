@@ -22,6 +22,19 @@ router.get('/today', async (req, res) => {
   }
 });
 
+// GET /api/summaries/all - Get all summaries for timeline
+router.get('/all', async (req, res) => {
+  try {
+    const { user = 'anonymous', limit = 30 } = req.query;
+    const summaries = await DailySummary.getAllSummaries(user, parseInt(limit));
+
+    res.json({ summaries });
+  } catch (error) {
+    console.error('Error fetching all summaries:', error);
+    res.status(500).json({ error: 'Error al obtener los resúmenes' });
+  }
+});
+
 // POST /api/summaries/generate - Generate today's summary
 router.post('/generate', async (req, res) => {
   try {
@@ -77,6 +90,15 @@ router.post('/generate', async (req, res) => {
       return total + (spit.files ? spit.files.length : 0);
     }, 0);
 
+    // Extract locations for mapping
+    const locations = todaysSpits
+      .filter(spit => spit.location)
+      .map(spit => ({
+        lat: spit.location.lat,
+        lng: spit.location.lng,
+        spitId: spit._id
+      }));
+
     // Prepare data for AI
     const spitsData = todaysSpits.map(spit => ({
       content: spit.content,
@@ -126,8 +148,16 @@ Resumen:`,
       moodAnalysis: moodStats,
       locationCount,
       attachmentCount,
+      summarizedSpits: todaysSpits.map(spit => spit._id),
+      locations,
       timezone
     });
+
+    // Mark all spits as summarized
+    await Spit.updateMany(
+      { _id: { $in: todaysSpits.map(spit => spit._id) } },
+      { isSummarized: true }
+    );
 
     res.json({ summary });
   } catch (error) {

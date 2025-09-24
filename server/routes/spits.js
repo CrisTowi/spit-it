@@ -152,15 +152,21 @@ router.put('/:id', async (req, res) => {
       return res.status(400).json({ error: 'El contenido debe tener 180 caracteres o menos' });
     }
 
+    // Check if spit exists and is not summarized
+    const existingSpit = await Spit.findOne({ _id: id, user });
+    if (!existingSpit) {
+      return res.status(404).json({ error: 'Spit no encontrado' });
+    }
+
+    if (existingSpit.isSummarized) {
+      return res.status(403).json({ error: 'No se puede editar un spit que ya ha sido incluido en un resumen de IA' });
+    }
+
     const spit = await Spit.findOneAndUpdate(
       { _id: id, user },
       { content: content.trim() },
       { new: true, runValidators: true }
     );
-
-    if (!spit) {
-      return res.status(404).json({ error: 'Spit no encontrado' });
-    }
 
     res.json(spit);
   } catch (error) {
@@ -175,11 +181,17 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params;
     const { user = 'anonymous' } = req.query;
 
-    const spit = await Spit.findOneAndDelete({ _id: id, user });
-
-    if (!spit) {
+    // Check if spit exists and is not summarized
+    const existingSpit = await Spit.findOne({ _id: id, user });
+    if (!existingSpit) {
       return res.status(404).json({ error: 'Spit no encontrado' });
     }
+
+    if (existingSpit.isSummarized) {
+      return res.status(403).json({ error: 'No se puede eliminar un spit que ya ha sido incluido en un resumen de IA' });
+    }
+
+    const spit = await Spit.findOneAndDelete({ _id: id, user });
 
     res.json({ message: 'Spit eliminado exitosamente' });
   } catch (error) {
@@ -189,3 +201,4 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
+

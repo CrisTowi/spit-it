@@ -67,6 +67,10 @@ class ApiService {
     return this.request(`/summaries/today?user=${user}&timezone=${encodeURIComponent(timezone)}`);
   }
 
+  async getAllSummaries(user = 'anonymous', limit = 30) {
+    return this.request(`/summaries/all?user=${user}&limit=${limit}`);
+  }
+
   async generateSummary(user = 'anonymous') {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     return this.request('/summaries/generate', {

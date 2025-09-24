@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, MapPin, TrendingUp, Sparkles, Loader2 } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { Calendar, MapPin, TrendingUp, Sparkles, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import apiService from '../services/api';
@@ -11,6 +11,7 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [summaryError, setSummaryError] = useState(null);
   const [hasGeneratedToday, setHasGeneratedToday] = useState(false);
+  const [isMapExpanded, setIsMapExpanded] = useState(false);
   const getMoodStats = () => {
     const moodCounts = todaysSpits.reduce((acc, spit) => {
       acc[spit.mood] = (acc[spit.mood] || 0) + 1;
@@ -68,6 +69,19 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
     // Calculate center point for multiple locations
     const avgLat = locationsWithSpits.reduce((sum, spit) => sum + spit.location.lat, 0) / locationsWithSpits.length;
     const avgLng = locationsWithSpits.reduce((sum, spit) => sum + spit.location.lng, 0) / locationsWithSpits.length;
+
+    return [avgLat, avgLng];
+  };
+
+  const getSummaryMapCenter = () => {
+    if (!aiSummary || !aiSummary.locations || aiSummary.locations.length === 0) return [0, 0];
+
+    if (aiSummary.locations.length === 1) {
+      return [aiSummary.locations[0].lat, aiSummary.locations[0].lng];
+    }
+
+    const avgLat = aiSummary.locations.reduce((sum, loc) => sum + loc.lat, 0) / aiSummary.locations.length;
+    const avgLng = aiSummary.locations.reduce((sum, loc) => sum + loc.lng, 0) / aiSummary.locations.length;
 
     return [avgLat, avgLng];
   };
@@ -221,6 +235,81 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
                 })}
               </span>
             </div>
+
+            {/* Collapsible Map for Summary Locations */}
+            {aiSummary.locations && aiSummary.locations.length > 0 && (
+              <div className="summary-location-section">
+                <button
+                  className="summary-map-toggle-btn"
+                  onClick={() => setIsMapExpanded(!isMapExpanded)}
+                >
+                  <MapPin size={16} />
+                  Ver Mapa de Ubicaciones ({aiSummary.locations.length})
+                  {isMapExpanded ? (
+                    <ChevronUp size={16} />
+                  ) : (
+                    <ChevronDown size={16} />
+                  )}
+                </button>
+
+                {isMapExpanded && (
+                  <div className="summary-map-container">
+                    <MapContainer
+                      center={getSummaryMapCenter()}
+                      zoom={13}
+                      style={{ height: '300px', width: '100%' }}
+                      className="leaflet-container"
+                    >
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      />
+
+                      {/* Markers for each location */}
+                      {aiSummary.locations.map((location, index) => {
+                        const spit = aiSummary.summarizedSpits?.find(s => s._id === location.spitId);
+                        return (
+                          <Marker
+                            key={index}
+                            position={[location.lat, location.lng]}
+                            icon={L.divIcon({
+                              className: 'custom-marker',
+                              html: `<div class="marker-content">${spit ? getMoodIcon(spit.mood) : '📍'}</div>`,
+                              iconSize: [30, 30],
+                              iconAnchor: [15, 15]
+                            })}
+                          >
+                            <Popup className="map-popup">
+                              <div className="popup-content">
+                                {spit && (
+                                  <>
+                                    <div className="popup-header">
+                                      <span className="popup-mood">{getMoodIcon(spit.mood)}</span>
+                                      <span className="popup-time">{formatDate(spit.timestamp)}</span>
+                                    </div>
+                                    <div className="popup-text">{spit.content}</div>
+                                  </>
+                                )}
+                              </div>
+                            </Popup>
+                          </Marker>
+                        );
+                      })}
+
+                      {/* Polyline connecting all locations */}
+                      {aiSummary.locations.length > 1 && (
+                        <Polyline
+                          positions={aiSummary.locations.map(loc => [loc.lat, loc.lng])}
+                          color="#3b82f6"
+                          weight={3}
+                          opacity={0.7}
+                        />
+                      )}
+                    </MapContainer>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 

@@ -97,20 +97,29 @@ const SpitItem = ({ spit, onDelete, onEdit }) => {
           </span>
         </div>
         <div className="spit-actions">
-          <button
-            onClick={handleEdit}
-            className="action-btn edit-btn"
-            title={isEditing ? "Guardar cambios" : "Editar spit"}
-          >
-            {isEditing ? "💾" : "✏️"}
-          </button>
-          <button
-            onClick={handleDelete}
-            className="action-btn delete-btn"
-            title="Eliminar spit"
-          >
-            🗑️
-          </button>
+          {spit.isSummarized ? (
+            <div className="summarized-badge" title="Este spit está incluido en un resumen de IA">
+              <span className="badge-icon">🔒</span>
+              <span className="badge-text">Resumido</span>
+            </div>
+          ) : (
+            <>
+              <button
+                onClick={handleEdit}
+                className="action-btn edit-btn"
+                title={isEditing ? "Guardar cambios" : "Editar spit"}
+              >
+                {isEditing ? "💾" : "✏️"}
+              </button>
+              <button
+                onClick={handleDelete}
+                className="action-btn delete-btn"
+                title="Eliminar spit"
+              >
+                🗑️
+              </button>
+            </>
+          )}
         </div>
       </div>
 

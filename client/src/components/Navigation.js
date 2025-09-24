@@ -1,11 +1,12 @@
 import React from 'react';
-import { Home, Map, FileText } from 'lucide-react';
+import { Home, Map, FileText, Clock } from 'lucide-react';
 import './Navigation.css';
 
 const Navigation = ({ currentView, onViewChange }) => {
   const navItems = [
     { id: 'feed', label: 'Inicio', icon: Home },
-    { id: 'summary', label: 'Resumen', icon: FileText }
+    { id: 'summary', label: 'Resumen', icon: FileText },
+    { id: 'timeline', label: 'Timeline', icon: Clock }
   ];
 
   return (
