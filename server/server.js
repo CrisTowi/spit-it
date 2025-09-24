@@ -43,9 +43,11 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/spitit', 
 
 // Import routes
 const spitRoutes = require('./routes/spits');
+const summaryRoutes = require('./routes/summaries');
 
 // Routes
 app.use('/api/spits', spitRoutes);
+app.use('/api/summaries', summaryRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

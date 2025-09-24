@@ -59,6 +59,18 @@ class ApiService {
     });
   }
 
+  // Summaries API
+  async getTodaysSummary(user = 'anonymous') {
+    return this.request(`/summaries/today?user=${user}`);
+  }
+
+  async generateSummary(user = 'anonymous') {
+    return this.request('/summaries/generate', {
+      method: 'POST',
+      body: JSON.stringify({ user }),
+    });
+  }
+
   // Health check
   async healthCheck() {
     return this.request('/health');

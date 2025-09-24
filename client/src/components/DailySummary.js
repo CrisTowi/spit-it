@@ -1,11 +1,16 @@
-import React from 'react';
-import { Calendar, MapPin, TrendingUp, Lightbulb } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, MapPin, TrendingUp, Sparkles, Loader2 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import apiService from '../services/api';
 import './DailySummary.css';
 
 const DailySummary = ({ todaysSpits, totalSpits }) => {
+  const [aiSummary, setAiSummary] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [summaryError, setSummaryError] = useState(null);
+  const [hasGeneratedToday, setHasGeneratedToday] = useState(false);
   const getMoodStats = () => {
     const moodCounts = todaysSpits.reduce((acc, spit) => {
       acc[spit.mood] = (acc[spit.mood] || 0) + 1;
@@ -67,14 +72,6 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
     return [avgLat, avgLng];
   };
 
-  const getMostCommonMood = () => {
-    const moodStats = getMoodStats();
-    if (!moodStats || moodStats.length === 0) return null;
-
-    return moodStats.reduce((prev, current) =>
-      prev.count > current.count ? prev : current
-    );
-  };
 
   const formatDate = () => {
     const today = new Date();
@@ -86,8 +83,50 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
     });
   };
 
+  // Load existing AI summary on component mount
+  useEffect(() => {
+    loadTodaysSummary();
+  }, []);
+
+  const loadTodaysSummary = async () => {
+    try {
+      const response = await apiService.getTodaysSummary();
+      if (response.summary) {
+        setAiSummary(response.summary);
+        setHasGeneratedToday(true);
+      }
+    } catch (error) {
+      console.error('Error loading today\'s summary:', error);
+    }
+  };
+
+  const generateAISummary = async () => {
+    if (todaysSpits.length === 0) {
+      setSummaryError('No hay spits para generar un resumen');
+      return;
+    }
+
+    setIsGenerating(true);
+    setSummaryError(null);
+
+    try {
+      const response = await apiService.generateSummary();
+      setAiSummary(response.summary);
+      setHasGeneratedToday(true);
+    } catch (error) {
+      console.error('Error generating summary:', error);
+      if (error.message.includes('Ya se ha generado')) {
+        setHasGeneratedToday(true);
+        setSummaryError('Ya se ha generado un resumen para hoy');
+      } else {
+        setSummaryError('Error al generar el resumen. Inténtalo de nuevo.');
+      }
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const moodStats = getMoodStats();
-  const mostCommonMood = getMostCommonMood();
 
   return (
     <div className="daily-summary">
@@ -133,6 +172,65 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
         </div>
       </div>
 
+      {/* AI Summary Section */}
+      <div className="ai-summary-section">
+        <div className="ai-summary-header">
+          <h3 className="ai-summary-title">
+            <Sparkles size={20} />
+            Resumen con IA
+          </h3>
+          {!hasGeneratedToday && todaysSpits.length > 0 && (
+            <button
+              onClick={generateAISummary}
+              disabled={isGenerating}
+              className="generate-summary-btn"
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 size={16} className="spinning" />
+                  Generando...
+                </>
+              ) : (
+                <>
+                  <Sparkles size={16} />
+                  Generar Resumen
+                </>
+              )}
+            </button>
+          )}
+        </div>
+
+        {summaryError && (
+          <div className="summary-error">
+            <p>{summaryError}</p>
+          </div>
+        )}
+
+        {aiSummary && (
+          <div className="ai-summary-content">
+            <div className="ai-summary-text">
+              {aiSummary.summary}
+            </div>
+            <div className="ai-summary-meta">
+              <span className="ai-summary-date">
+                Generado el {new Date(aiSummary.createdAt).toLocaleDateString('es-ES', {
+                  day: 'numeric',
+                  month: 'long',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {!aiSummary && !isGenerating && !summaryError && todaysSpits.length > 0 && (
+          <div className="ai-summary-placeholder">
+            <p>Genera un resumen inteligente de tu día basado en tus spits</p>
+          </div>
+        )}
+      </div>
+
       {todaysSpits.length > 0 ? (
         <>
           {moodStats && (
@@ -161,32 +259,6 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
             </div>
           )}
 
-          {mostCommonMood && (
-            <div className="insights">
-              <h3 className="insights-title">
-                <Lightbulb size={20} />
-                Perspectiva de Hoy
-              </h3>
-              <div className="insight-content">
-                <p>
-                  Tu estado de ánimo más común hoy fue <strong>{getMoodLabel(mostCommonMood.mood)}</strong>
-                  {' '}{getMoodIcon(mostCommonMood.mood)} con {mostCommonMood.count} spits.
-                </p>
-                {mostCommonMood.mood === 'happy' && (
-                  <p>¡Parece que tuviste un día positivo! ¡Sigue compartiendo esa alegría! ✨</p>
-                )}
-                {mostCommonMood.mood === 'frustrated' && (
-                  <p>Parece que tuviste algunos desafíos hoy. Recuerda, está bien sentirse frustrado - ¡mañana es una nueva oportunidad! 💪</p>
-                )}
-                {mostCommonMood.mood === 'inspired' && (
-                  <p>¡Qué día tan inspirador! ¡Tu creatividad y motivación están brillando! 🌟</p>
-                )}
-                {mostCommonMood.mood === 'neutral' && (
-                  <p>Un día equilibrado con pensamientos constantes. ¡A veces neutral es exactamente lo que necesitamos! ⚖️</p>
-                )}
-              </div>
-            </div>
-          )}
 
           {getLocationCount() > 0 && (
             <div className="map-section">

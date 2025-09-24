@@ -225,43 +225,46 @@ const SpitForm = ({ onAddSpit, currentLocation }) => {
           </div>
         </div>
 
-        <div className="form-group">
-          <label className="form-label">Adjuntos:</label>
-          <div className="file-upload-section">
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="file-upload-btn"
-            >
-              <Upload size={16} />
-              Agregar Archivos
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              accept="image/*,video/*,.pdf,.doc,.docx,.txt"
-              onChange={handleFileUpload}
-              style={{ display: 'none' }}
-            />
-            {files.length > 0 && (
-              <div className="file-preview">
-                {files.map((file, index) => (
-                  <div key={index} className="file-item">
-                    <span className="file-name">{file.name}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeFile(index)}
-                      className="remove-file-btn"
-                    >
-                      <X size={14} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+        {/* File Upload Section - Hidden for now, will be implemented later */}
+        {false && (
+          <div className="form-group">
+            <label className="form-label">Adjuntos:</label>
+            <div className="file-upload-section">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="file-upload-btn"
+              >
+                <Upload size={16} />
+                Agregar Archivos
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="image/*,video/*,.pdf,.doc,.docx,.txt"
+                onChange={handleFileUpload}
+                style={{ display: 'none' }}
+              />
+              {files.length > 0 && (
+                <div className="file-preview">
+                  {files.map((file, index) => (
+                    <div key={index} className="file-item">
+                      <span className="file-name">{file.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeFile(index)}
+                        className="remove-file-btn"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="form-group">
           <label className="form-label">¿Cómo te sientes?</label>
