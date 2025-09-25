@@ -1,0 +1,176 @@
+.pwa-installer {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 400px;
+  margin: 0 auto;
+  animation: slideUp 0.3s ease-out;
+}
+
+.installer-content {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.installer-icon {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.installer-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.installer-text h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.installer-text p {
+  margin: 0;
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.installer-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.install-btn {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.install-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.install-btn:active {
+  transform: translateY(0);
+}
+
+.dismiss-btn {
+  background: #f3f4f6;
+  color: #6b7280;
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dismiss-btn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .pwa-installer {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+  }
+
+  .installer-content {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .installer-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .installer-text h3 {
+    font-size: 15px;
+  }
+
+  .installer-text p {
+    font-size: 13px;
+  }
+
+  .install-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .dismiss-btn {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .installer-content {
+    background: #1f2937;
+    border-color: #374151;
+  }
+
+  .installer-text h3 {
+    color: #f9fafb;
+  }
+
+  .installer-text p {
+    color: #d1d5db;
+  }
+
+  .dismiss-btn {
+    background: #374151;
+    color: #d1d5db;
+  }
+
+  .dismiss-btn:hover {
+    background: #4b5563;
+    color: #f9fafb;
+  }
+}

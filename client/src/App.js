@@ -5,6 +5,8 @@ import SpitForm from './components/SpitForm';
 import SpitList from './components/SpitList';
 import DailySummary from './components/DailySummary';
 import SummaryTimeline from './components/SummaryTimeline';
+import PWAInstaller from './components/PWAInstaller';
+import OfflineIndicator from './components/OfflineIndicator';
 import apiService from './services/api';
 import './App.css';
 
@@ -154,6 +156,7 @@ function App() {
 
   return (
     <div className="app">
+      <OfflineIndicator />
       <Header />
       <Navigation currentView={currentView} onViewChange={setCurrentView} />
 
@@ -187,6 +190,9 @@ function App() {
           <SummaryTimeline />
         )}
       </main>
+
+      {/* PWA Installer */}
+      <PWAInstaller />
     </div>
   );
 }
