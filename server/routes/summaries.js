@@ -144,10 +144,10 @@ ${spitsData.map((spit, index) =>
 Genera un resumen que:
 1. Refleje los patrones de estado de ánimo del período
 2. Identifique temas o preocupaciones recurrentes
-3. Destaque momentos positivos o inspiradores
+3. Destaque momentos positivos o inspiradores pero tambien negativos
 4. Ofrezca una perspectiva reflexiva sobre las experiencias
-5. Sea alentador y constructivo
-6. Tenga entre 150-250 palabras
+5. Sea alentador y constructivo pero tambien realista
+6. Tenga entre 100-150 palabras
 7. Use un tono cálido y personal
 8. Mencione el período de tiempo cubierto
 
