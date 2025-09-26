@@ -156,6 +156,7 @@
 .summary-stats {
   display: flex;
   gap: 16px;
+  overflow: auto;
 }
 
 .stat {
@@ -377,6 +378,7 @@
 
   .summary-stats {
     gap: 12px;
+    overflow: auto;
   }
 
   .stat {
