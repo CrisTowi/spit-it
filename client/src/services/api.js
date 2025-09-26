@@ -67,15 +67,23 @@ class ApiService {
     return this.request(`/summaries/today?user=${user}&timezone=${encodeURIComponent(timezone)}`);
   }
 
+  async getLatestSummary(user = 'anonymous') {
+    return this.request(`/summaries/latest?user=${user}`);
+  }
+
   async getAllSummaries(user = 'anonymous', limit = 30) {
     return this.request(`/summaries/all?user=${user}&limit=${limit}`);
   }
 
-  async generateSummary(user = 'anonymous') {
+  async getUnsummarizedSpitsCount(user = 'anonymous') {
+    return this.request(`/summaries/unsummarized-count?user=${user}`);
+  }
+
+  async generateSummary(user = 'anonymous', limit = 20) {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     return this.request('/summaries/generate', {
       method: 'POST',
-      body: JSON.stringify({ user, timezone }),
+      body: JSON.stringify({ user, timezone, limit }),
     });
   }
 

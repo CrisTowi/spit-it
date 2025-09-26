@@ -65,8 +65,9 @@ const dailySummarySchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Compound index to ensure only one summary per user per day
-dailySummarySchema.index({ date: 1, user: 1 }, { unique: true });
+// Index for better query performance
+dailySummarySchema.index({ date: 1, user: 1 });
+dailySummarySchema.index({ createdAt: -1, user: 1 });
 
 // Static method to get today's summary for a user
 dailySummarySchema.statics.getTodaysSummary = function (user = 'anonymous', timezone = 'UTC') {
@@ -110,8 +111,16 @@ dailySummarySchema.statics.createTodaysSummary = function (summaryData) {
 // Static method to get all summaries for a user (for timeline)
 dailySummarySchema.statics.getAllSummaries = function (user = 'anonymous', limit = 30) {
   return this.find({ user })
-    .sort({ date: -1 })
+    .sort({ createdAt: -1 })
     .limit(limit)
+    .populate('summarizedSpits', 'content mood timestamp location')
+    .lean();
+};
+
+// Static method to get latest summary for a user
+dailySummarySchema.statics.getLatestSummary = function (user = 'anonymous') {
+  return this.findOne({ user })
+    .sort({ createdAt: -1 })
     .populate('summarizedSpits', 'content mood timestamp location')
     .lean();
 };

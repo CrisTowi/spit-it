@@ -46,6 +46,25 @@ const SummaryTimeline = () => {
     });
   };
 
+  const formatDateRange = (summary) => {
+    if (!summary.summarizedSpits || summary.summarizedSpits.length === 0) {
+      return formatDate(summary.date);
+    }
+
+    const spits = summary.summarizedSpits;
+    const oldestSpit = spits[spits.length - 1];
+    const newestSpit = spits[0];
+
+    const oldestDate = new Date(oldestSpit.timestamp);
+    const newestDate = new Date(newestSpit.timestamp);
+
+    if (oldestDate.toDateString() === newestDate.toDateString()) {
+      return formatDate(newestDate);
+    } else {
+      return `${oldestDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })} - ${newestDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+    }
+  };
+
   const formatTime = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString('es-ES', {
@@ -155,7 +174,7 @@ const SummaryTimeline = () => {
             <div className="timeline-content">
               <div className="summary-header">
                 <div className="summary-date">
-                  <h3>{formatDate(summary.date)}</h3>
+                  <h3>{formatDateRange(summary)}</h3>
                   <span className="summary-time">
                     <Clock size={14} />
                     {formatTime(summary.createdAt)}

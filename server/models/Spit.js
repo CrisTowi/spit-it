@@ -78,4 +78,23 @@ spitSchema.virtual('formattedDate').get(function () {
 // Ensure virtual fields are serialized
 spitSchema.set('toJSON', { virtuals: true });
 
+// Static method to get unsummarized spits for a user
+spitSchema.statics.getUnsummarizedSpits = function (user = 'anonymous', limit = 50) {
+  return this.find({
+    user,
+    isSummarized: false
+  })
+    .sort({ timestamp: -1 })
+    .limit(limit)
+    .lean();
+};
+
+// Static method to get unsummarized spits count
+spitSchema.statics.getUnsummarizedSpitsCount = function (user = 'anonymous') {
+  return this.countDocuments({
+    user,
+    isSummarized: false
+  });
+};
+
 module.exports = mongoose.model('Spit', spitSchema);

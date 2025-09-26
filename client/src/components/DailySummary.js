@@ -12,6 +12,7 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
   const [summaryError, setSummaryError] = useState(null);
   const [hasGeneratedToday, setHasGeneratedToday] = useState(false);
   const [isMapExpanded, setIsMapExpanded] = useState(false);
+  const [unsummarizedCount, setUnsummarizedCount] = useState(0);
   const getMoodStats = () => {
     const moodCounts = todaysSpits.reduce((acc, spit) => {
       acc[spit.mood] = (acc[spit.mood] || 0) + 1;
@@ -97,26 +98,36 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
     });
   };
 
-  // Load existing AI summary on component mount
+  // Load existing AI summary and unsummarized count on component mount
   useEffect(() => {
-    loadTodaysSummary();
+    loadLatestSummary();
+    loadUnsummarizedCount();
   }, []);
 
-  const loadTodaysSummary = async () => {
+  const loadLatestSummary = async () => {
     try {
-      const response = await apiService.getTodaysSummary();
+      const response = await apiService.getLatestSummary();
       if (response.summary) {
         setAiSummary(response.summary);
         setHasGeneratedToday(true);
       }
     } catch (error) {
-      console.error('Error loading today\'s summary:', error);
+      console.error('Error loading latest summary:', error);
+    }
+  };
+
+  const loadUnsummarizedCount = async () => {
+    try {
+      const response = await apiService.getUnsummarizedSpitsCount();
+      setUnsummarizedCount(response.count || 0);
+    } catch (error) {
+      console.error('Error loading unsummarized count:', error);
     }
   };
 
   const generateAISummary = async () => {
-    if (todaysSpits.length === 0) {
-      setSummaryError('No hay spits para generar un resumen');
+    if (unsummarizedCount === 0) {
+      setSummaryError('No hay spits sin resumir para generar un resumen');
       return;
     }
 
@@ -127,11 +138,13 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
       const response = await apiService.generateSummary();
       setAiSummary(response.summary);
       setHasGeneratedToday(true);
+      // Reload unsummarized count after generating summary
+      loadUnsummarizedCount();
     } catch (error) {
       console.error('Error generating summary:', error);
-      if (error.message.includes('Ya se ha generado')) {
-        setHasGeneratedToday(true);
-        setSummaryError('Ya se ha generado un resumen para hoy');
+      if (error.message.includes('No hay spits sin resumir')) {
+        setSummaryError('No hay spits sin resumir para generar un resumen');
+        loadUnsummarizedCount(); // Refresh count
       } else {
         setSummaryError('Error al generar el resumen. Inténtalo de nuevo.');
       }
@@ -158,6 +171,14 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
           <div className="stat-content">
             <div className="stat-number">{todaysSpits.length}</div>
             <div className="stat-label">Spits de Hoy</div>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-icon">📝</div>
+          <div className="stat-content">
+            <div className="stat-number">{unsummarizedCount}</div>
+            <div className="stat-label">Sin Resumir</div>
           </div>
         </div>
 
@@ -193,7 +214,7 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
             <Sparkles size={20} />
             Resumen con IA
           </h3>
-          {!hasGeneratedToday && todaysSpits.length > 0 && (
+          {unsummarizedCount > 0 && (
             <button
               onClick={generateAISummary}
               disabled={isGenerating}
@@ -207,7 +228,7 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
               ) : (
                 <>
                   <Sparkles size={16} />
-                  Generar Resumen
+                  Generar Resumen ({unsummarizedCount} spits)
                 </>
               )}
             </button>
@@ -313,9 +334,15 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
           </div>
         )}
 
-        {!aiSummary && !isGenerating && !summaryError && todaysSpits.length > 0 && (
+        {!aiSummary && !isGenerating && !summaryError && unsummarizedCount > 0 && (
           <div className="ai-summary-placeholder">
-            <p>Genera un resumen inteligente de tu día basado en tus spits</p>
+            <p>Genera un resumen inteligente basado en tus {unsummarizedCount} spits sin resumir</p>
+          </div>
+        )}
+
+        {!aiSummary && !isGenerating && !summaryError && unsummarizedCount === 0 && (
+          <div className="ai-summary-placeholder">
+            <p>¡Todos tus spits han sido resumidos! Crea más spits para generar nuevos resúmenes.</p>
           </div>
         )}
       </div>
