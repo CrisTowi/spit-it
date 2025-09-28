@@ -1,20 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const Spit = require('../models/Spit');
+const { authenticate } = require('../middleware/auth');
 
 // GET /api/spits - Get all spits
-router.get('/', async (req, res) => {
+router.get('/', authenticate, async (req, res) => {
   try {
-    const { page = 1, limit = 50, user = 'anonymous' } = req.query;
+    const { page = 1, limit = 50 } = req.query;
     const skip = (page - 1) * limit;
 
-    const spits = await Spit.find({ user })
+    const spits = await Spit.find({ user: req.user._id })
       .sort({ timestamp: -1 })
       .skip(skip)
       .limit(parseInt(limit))
       .lean();
 
-    const total = await Spit.countDocuments({ user });
+    const total = await Spit.countDocuments({ user: req.user._id });
 
     res.json({
       spits,
@@ -32,9 +33,9 @@ router.get('/', async (req, res) => {
 });
 
 // GET /api/spits/today - Get today's spits
-router.get('/today', async (req, res) => {
+router.get('/today', authenticate, async (req, res) => {
   try {
-    const { user = 'anonymous', timezone = 'UTC' } = req.query;
+    const timezone = req.user.preferences?.timezone || 'UTC';
 
     // Get today's date in the user's timezone
     const now = new Date();
@@ -46,7 +47,7 @@ router.get('/today', async (req, res) => {
     const tomorrowUTC = new Date(todayUTC.getTime() + (24 * 60 * 60 * 1000));
 
     const todaysSpits = await Spit.find({
-      user,
+      user: req.user._id,
       timestamp: {
         $gte: todayUTC,
         $lt: tomorrowUTC
@@ -61,11 +62,11 @@ router.get('/today', async (req, res) => {
 });
 
 // GET /api/spits/stats - Get statistics
-router.get('/stats', async (req, res) => {
+router.get('/stats', authenticate, async (req, res) => {
   try {
-    const { user = 'anonymous', timezone = 'UTC' } = req.query;
+    const timezone = req.user.preferences?.timezone || 'UTC';
 
-    const totalSpits = await Spit.countDocuments({ user });
+    const totalSpits = await Spit.countDocuments({ user: req.user._id });
 
     // Get today's date in the user's timezone
     const now = new Date();
@@ -77,17 +78,17 @@ router.get('/stats', async (req, res) => {
     const tomorrowUTC = new Date(todayUTC.getTime() + (24 * 60 * 60 * 1000));
 
     const todaysSpits = await Spit.countDocuments({
-      user,
+      user: req.user._id,
       timestamp: { $gte: todayUTC, $lt: tomorrowUTC }
     });
 
     const locationCount = await Spit.countDocuments({
-      user,
+      user: req.user._id,
       location: { $exists: true, $ne: null }
     });
 
     const attachmentCount = await Spit.aggregate([
-      { $match: { user } },
+      { $match: { user: req.user._id } },
       { $project: { fileCount: { $size: { $ifNull: ['$files', []] } } } },
       { $group: { _id: null, total: { $sum: '$fileCount' } } }
     ]);
@@ -105,9 +106,9 @@ router.get('/stats', async (req, res) => {
 });
 
 // POST /api/spits - Create a new spit
-router.post('/', async (req, res) => {
+router.post('/', authenticate, async (req, res) => {
   try {
-    const { content, mood, files, location, user = 'anonymous' } = req.body;
+    const { content, mood, files, location } = req.body;
 
     // Validation
     if (!content || content.trim().length === 0) {
@@ -127,7 +128,7 @@ router.post('/', async (req, res) => {
       mood: mood || 'neutral',
       files: files || [],
       location: location || null,
-      user
+      user: req.user._id
     });
 
     const savedSpit = await spit.save();
@@ -139,10 +140,10 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/spits/:id - Update a spit
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticate, async (req, res) => {
   try {
     const { id } = req.params;
-    const { content, user = 'anonymous' } = req.body;
+    const { content } = req.body;
 
     if (!content || content.trim().length === 0) {
       return res.status(400).json({ error: 'El contenido es requerido' });
@@ -153,7 +154,7 @@ router.put('/:id', async (req, res) => {
     }
 
     // Check if spit exists and is not summarized
-    const existingSpit = await Spit.findOne({ _id: id, user });
+    const existingSpit = await Spit.findOne({ _id: id, user: req.user._id });
     if (!existingSpit) {
       return res.status(404).json({ error: 'Spit no encontrado' });
     }
@@ -163,7 +164,7 @@ router.put('/:id', async (req, res) => {
     }
 
     const spit = await Spit.findOneAndUpdate(
-      { _id: id, user },
+      { _id: id, user: req.user._id },
       { content: content.trim() },
       { new: true, runValidators: true }
     );
@@ -176,13 +177,12 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/spits/:id - Delete a spit
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticate, async (req, res) => {
   try {
     const { id } = req.params;
-    const { user = 'anonymous' } = req.query;
 
     // Check if spit exists and is not summarized
-    const existingSpit = await Spit.findOne({ _id: id, user });
+    const existingSpit = await Spit.findOne({ _id: id, user: req.user._id });
     if (!existingSpit) {
       return res.status(404).json({ error: 'Spit no encontrado' });
     }
@@ -191,7 +191,7 @@ router.delete('/:id', async (req, res) => {
       return res.status(403).json({ error: 'No se puede eliminar un spit que ya ha sido incluido en un resumen de IA' });
     }
 
-    const spit = await Spit.findOneAndDelete({ _id: id, user });
+    const spit = await Spit.findOneAndDelete({ _id: id, user: req.user._id });
 
     res.json({ message: 'Spit eliminado exitosamente' });
   } catch (error) {

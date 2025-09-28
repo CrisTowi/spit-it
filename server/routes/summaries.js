@@ -4,12 +4,12 @@ const { generateText } = require("ai")
 const { openai } = require("@ai-sdk/openai")
 const DailySummary = require('../models/DailySummary');
 const Spit = require('../models/Spit');
+const { authenticate } = require('../middleware/auth');
 
 // GET /api/summaries/latest - Get latest summary
-router.get('/latest', async (req, res) => {
+router.get('/latest', authenticate, async (req, res) => {
   try {
-    const { user = 'anonymous' } = req.query;
-    const summary = await DailySummary.getLatestSummary(user);
+    const summary = await DailySummary.getLatestSummary(req.user._id);
 
     if (!summary) {
       return res.json({ summary: null });
@@ -23,10 +23,10 @@ router.get('/latest', async (req, res) => {
 });
 
 // GET /api/summaries/today - Get today's summary (kept for backward compatibility)
-router.get('/today', async (req, res) => {
+router.get('/today', authenticate, async (req, res) => {
   try {
-    const { user = 'anonymous', timezone = 'UTC' } = req.query;
-    const summary = await DailySummary.getTodaysSummary(user, timezone);
+    const timezone = req.user.preferences?.timezone || 'UTC';
+    const summary = await DailySummary.getTodaysSummary(req.user._id, timezone);
 
     if (!summary) {
       return res.json({ summary: null });
@@ -40,10 +40,10 @@ router.get('/today', async (req, res) => {
 });
 
 // GET /api/summaries/all - Get all summaries for timeline
-router.get('/all', async (req, res) => {
+router.get('/all', authenticate, async (req, res) => {
   try {
-    const { user = 'anonymous', limit = 30 } = req.query;
-    const summaries = await DailySummary.getAllSummaries(user, parseInt(limit));
+    const { limit = 30 } = req.query;
+    const summaries = await DailySummary.getAllSummaries(req.user._id, parseInt(limit));
 
     res.json({ summaries });
   } catch (error) {
@@ -53,10 +53,9 @@ router.get('/all', async (req, res) => {
 });
 
 // GET /api/summaries/unsummarized-count - Get count of unsummarized spits
-router.get('/unsummarized-count', async (req, res) => {
+router.get('/unsummarized-count', authenticate, async (req, res) => {
   try {
-    const { user = 'anonymous' } = req.query;
-    const count = await Spit.getUnsummarizedSpitsCount(user);
+    const count = await Spit.getUnsummarizedSpitsCount(req.user._id);
 
     res.json({ count });
   } catch (error) {
@@ -66,12 +65,13 @@ router.get('/unsummarized-count', async (req, res) => {
 });
 
 // POST /api/summaries/generate - Generate summary from unsummarized spits
-router.post('/generate', async (req, res) => {
+router.post('/generate', authenticate, async (req, res) => {
   try {
-    const { user = 'anonymous', timezone = 'UTC', limit = 20 } = req.body;
+    const { limit = 20 } = req.body;
+    const timezone = req.user.preferences?.timezone || 'UTC';
 
     // Get unsummarized spits
-    const unsummarizedSpits = await Spit.getUnsummarizedSpits(user, limit);
+    const unsummarizedSpits = await Spit.getUnsummarizedSpits(req.user._id, limit);
 
     if (unsummarizedSpits.length === 0) {
       return res.status(400).json({
@@ -161,7 +161,7 @@ Resumen:`,
     summaryDate.setHours(0, 0, 0, 0);
 
     const summary = await DailySummary.create({
-      user,
+      user: req.user._id,
       date: summaryDate,
       summary: aiSummary,
       spitsCount: totalSpits,

@@ -7,8 +7,9 @@ const dailySummarySchema = new mongoose.Schema({
     index: true
   },
   user: {
-    type: String,
-    default: 'anonymous',
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
     index: true
   },
   summary: {
@@ -70,7 +71,7 @@ dailySummarySchema.index({ date: 1, user: 1 });
 dailySummarySchema.index({ createdAt: -1, user: 1 });
 
 // Static method to get today's summary for a user
-dailySummarySchema.statics.getTodaysSummary = function (user = 'anonymous', timezone = 'UTC') {
+dailySummarySchema.statics.getTodaysSummary = function (userId, timezone = 'UTC') {
   // Get today's date in the user's timezone
   const now = new Date();
   const userToday = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
@@ -81,7 +82,7 @@ dailySummarySchema.statics.getTodaysSummary = function (user = 'anonymous', time
   const tomorrowUTC = new Date(todayUTC.getTime() + (24 * 60 * 60 * 1000));
 
   return this.findOne({
-    user,
+    user: userId,
     date: {
       $gte: todayUTC,
       $lt: tomorrowUTC
@@ -109,8 +110,8 @@ dailySummarySchema.statics.createTodaysSummary = function (summaryData) {
 };
 
 // Static method to get all summaries for a user (for timeline)
-dailySummarySchema.statics.getAllSummaries = function (user = 'anonymous', limit = 30) {
-  return this.find({ user })
+dailySummarySchema.statics.getAllSummaries = function (userId, limit = 30) {
+  return this.find({ user: userId })
     .sort({ createdAt: -1 })
     .limit(limit)
     .populate('summarizedSpits', 'content mood timestamp location')
@@ -118,8 +119,8 @@ dailySummarySchema.statics.getAllSummaries = function (user = 'anonymous', limit
 };
 
 // Static method to get latest summary for a user
-dailySummarySchema.statics.getLatestSummary = function (user = 'anonymous') {
-  return this.findOne({ user })
+dailySummarySchema.statics.getLatestSummary = function (userId) {
+  return this.findOne({ user: userId })
     .sort({ createdAt: -1 })
     .populate('summarizedSpits', 'content mood timestamp location')
     .lean();

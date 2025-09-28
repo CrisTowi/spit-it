@@ -198,13 +198,13 @@ const DailySummary = ({ todaysSpits, totalSpits }) => {
           </div>
         </div>
 
-        <div className="stat-card">
+        {/* <div className="stat-card">
           <div className="stat-icon">📎</div>
           <div className="stat-content">
             <div className="stat-number">{getAttachmentCount()}</div>
             <div className="stat-label">Adjuntos</div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* AI Summary Section */}

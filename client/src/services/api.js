@@ -1,11 +1,20 @@
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 class ApiService {
+  constructor() {
+    this.authToken = null;
+  }
+
+  setAuthToken(token) {
+    this.authToken = token;
+  }
+
   async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
     const config = {
       headers: {
         'Content-Type': 'application/json',
+        ...(this.authToken && { Authorization: `Bearer ${this.authToken}` }),
         ...options.headers,
       },
       ...options,
@@ -26,64 +35,106 @@ class ApiService {
     }
   }
 
+  // Authentication API
+  async login(email, password) {
+    return this.request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+  }
+
+  async register(name, email, password) {
+    return this.request('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password }),
+    });
+  }
+
+  async getProfile() {
+    return this.request('/auth/profile');
+  }
+
+  async updateProfile(profileData) {
+    return this.request('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(profileData),
+    });
+  }
+
+  async changePassword(currentPassword, newPassword) {
+    return this.request('/auth/change-password', {
+      method: 'PUT',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  }
+
+  async deleteAccount(password) {
+    return this.request('/auth/account', {
+      method: 'DELETE',
+      body: JSON.stringify({ password }),
+    });
+  }
+
+  async verifyToken() {
+    return this.request('/auth/verify-token', {
+      method: 'POST',
+    });
+  }
+
   // Spits API
-  async getSpits(page = 1, limit = 50, user = 'anonymous') {
-    return this.request(`/spits?page=${page}&limit=${limit}&user=${user}`);
+  async getSpits(page = 1, limit = 50) {
+    return this.request(`/spits?page=${page}&limit=${limit}`);
   }
 
-  async getTodaysSpits(user = 'anonymous') {
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    return this.request(`/spits/today?user=${user}&timezone=${encodeURIComponent(timezone)}`);
+  async getTodaysSpits() {
+    return this.request('/spits/today');
   }
 
-  async getStats(user = 'anonymous') {
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    return this.request(`/spits/stats?user=${user}&timezone=${encodeURIComponent(timezone)}`);
+  async getStats() {
+    return this.request('/spits/stats');
   }
 
-  async createSpit(spitData, user = 'anonymous') {
+  async createSpit(spitData) {
     return this.request('/spits', {
       method: 'POST',
-      body: JSON.stringify({ ...spitData, user }),
+      body: JSON.stringify(spitData),
     });
   }
 
-  async updateSpit(id, content, user = 'anonymous') {
+  async updateSpit(id, content) {
     return this.request(`/spits/${id}`, {
       method: 'PUT',
-      body: JSON.stringify({ content, user }),
+      body: JSON.stringify({ content }),
     });
   }
 
-  async deleteSpit(id, user = 'anonymous') {
-    return this.request(`/spits/${id}?user=${user}`, {
+  async deleteSpit(id) {
+    return this.request(`/spits/${id}`, {
       method: 'DELETE',
     });
   }
 
   // Summaries API
-  async getTodaysSummary(user = 'anonymous') {
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    return this.request(`/summaries/today?user=${user}&timezone=${encodeURIComponent(timezone)}`);
+  async getTodaysSummary() {
+    return this.request('/summaries/today');
   }
 
-  async getLatestSummary(user = 'anonymous') {
-    return this.request(`/summaries/latest?user=${user}`);
+  async getLatestSummary() {
+    return this.request('/summaries/latest');
   }
 
-  async getAllSummaries(user = 'anonymous', limit = 30) {
-    return this.request(`/summaries/all?user=${user}&limit=${limit}`);
+  async getAllSummaries(limit = 30) {
+    return this.request(`/summaries/all?limit=${limit}`);
   }
 
-  async getUnsummarizedSpitsCount(user = 'anonymous') {
-    return this.request(`/summaries/unsummarized-count?user=${user}`);
+  async getUnsummarizedSpitsCount() {
+    return this.request('/summaries/unsummarized-count');
   }
 
-  async generateSummary(user = 'anonymous', limit = 20) {
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  async generateSummary(limit = 20) {
     return this.request('/summaries/generate', {
       method: 'POST',
-      body: JSON.stringify({ user, timezone, limit }),
+      body: JSON.stringify({ limit }),
     });
   }
 

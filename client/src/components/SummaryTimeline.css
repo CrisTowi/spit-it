@@ -157,6 +157,7 @@
   display: flex;
   gap: 16px;
   overflow: auto;
+  justify-content: center;
 }
 
 .stat {

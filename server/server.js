@@ -42,10 +42,12 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/spitit', 
   });
 
 // Import routes
+const authRoutes = require('./routes/auth');
 const spitRoutes = require('./routes/spits');
 const summaryRoutes = require('./routes/summaries');
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/spits', spitRoutes);
 app.use('/api/summaries', summaryRoutes);
 

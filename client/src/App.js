@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Header from './components/Header';
 import Navigation from './components/Navigation';
 import SpitForm from './components/SpitForm';
@@ -7,20 +8,29 @@ import DailySummary from './components/DailySummary';
 import SummaryTimeline from './components/SummaryTimeline';
 import PWAInstaller from './components/PWAInstaller';
 import OfflineIndicator from './components/OfflineIndicator';
+import Auth from './components/Auth';
+import UserProfile from './components/UserProfile';
 import apiService from './services/api';
 import './App.css';
 
-function App() {
+function AppContent() {
+  const { user, loading: authLoading, isAuthenticated } = useAuth();
   const [spits, setSpits] = useState([]);
   const [currentView, setCurrentView] = useState('feed');
   const [currentLocation, setCurrentLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showUserProfile, setShowUserProfile] = useState(false);
 
-  // Load spits from API on component mount
+  // Load spits from API on component mount and when user changes
   useEffect(() => {
-    loadSpits();
-  }, []);
+    if (isAuthenticated) {
+      loadSpits();
+    } else {
+      setSpits([]);
+      setLoading(false);
+    }
+  }, [isAuthenticated]);
 
   const loadSpits = async () => {
     try {
@@ -31,11 +41,7 @@ function App() {
     } catch (err) {
       console.error('Failed to load spits:', err);
       setError('Error al cargar los spits. Por favor verifica tu conexión.');
-      // Fallback to localStorage if API fails
-      const savedSpits = localStorage.getItem('spits');
-      if (savedSpits) {
-        setSpits(JSON.parse(savedSpits));
-      }
+      setSpits([]);
     } finally {
       setLoading(false);
     }
@@ -65,18 +71,9 @@ function App() {
       const newSpit = await apiService.createSpit(spitData);
       console.log('Adding new spit:', newSpit);
       setSpits(prevSpits => [newSpit, ...prevSpits]);
-      // Also save to localStorage as backup
-      localStorage.setItem('spits', JSON.stringify([newSpit, ...spits]));
     } catch (err) {
       console.error('Failed to create spit:', err);
-      // Fallback to localStorage
-      const fallbackSpit = {
-        _id: Date.now().toString(),
-        timestamp: new Date().toISOString(),
-        ...spitData
-      };
-      setSpits(prevSpits => [fallbackSpit, ...prevSpits]);
-      localStorage.setItem('spits', JSON.stringify([fallbackSpit, ...spits]));
+      setError('Error al crear el spit. Por favor intenta nuevamente.');
     }
   };
 
@@ -84,19 +81,13 @@ function App() {
     try {
       await apiService.deleteSpit(spitId);
       setSpits(prevSpits => prevSpits.filter(spit => spit._id !== spitId));
-      // Update localStorage
-      const updatedSpits = spits.filter(spit => spit._id !== spitId);
-      localStorage.setItem('spits', JSON.stringify(updatedSpits));
     } catch (err) {
       console.error('Failed to delete spit:', err);
       if (err.message.includes('resumen de IA')) {
         alert('No se puede eliminar un spit que ya ha sido incluido en un resumen de IA');
         return;
       }
-      // Fallback to localStorage
-      setSpits(prevSpits => prevSpits.filter(spit => spit._id !== spitId));
-      const updatedSpits = spits.filter(spit => spit._id !== spitId);
-      localStorage.setItem('spits', JSON.stringify(updatedSpits));
+      setError('Error al eliminar el spit. Por favor intenta nuevamente.');
     }
   };
 
@@ -108,27 +99,13 @@ function App() {
           spit._id === spitId ? updatedSpit : spit
         )
       );
-      // Update localStorage
-      const updatedSpits = spits.map(spit =>
-        spit._id === spitId ? updatedSpit : spit
-      );
-      localStorage.setItem('spits', JSON.stringify(updatedSpits));
     } catch (err) {
       console.error('Failed to update spit:', err);
       if (err.message.includes('resumen de IA')) {
         alert('No se puede editar un spit que ya ha sido incluido en un resumen de IA');
         return;
       }
-      // Fallback to localStorage
-      setSpits(prevSpits =>
-        prevSpits.map(spit =>
-          spit._id === spitId ? { ...spit, content: newContent } : spit
-        )
-      );
-      const updatedSpits = spits.map(spit =>
-        spit._id === spitId ? { ...spit, content: newContent } : spit
-      );
-      localStorage.setItem('spits', JSON.stringify(updatedSpits));
+      setError('Error al editar el spit. Por favor intenta nuevamente.');
     }
   };
 
@@ -142,10 +119,29 @@ function App() {
     });
   };
 
+  // Show loading screen while checking authentication
+  if (authLoading) {
+    return (
+      <div className="app">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Cargando SpitIt...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show authentication screen if not logged in
+  if (!isAuthenticated) {
+    console.log('Not authenticated');
+    return <Auth />;
+  }
+
+  // Show loading screen while loading spits
   if (loading) {
     return (
       <div className="app">
-        <Header />
+        <Header user={user} onShowProfile={() => setShowUserProfile(true)} />
         <div className="loading-container">
           <div className="loading-spinner"></div>
           <p>Cargando tus spits...</p>
@@ -157,7 +153,7 @@ function App() {
   return (
     <div className="app">
       <OfflineIndicator />
-      <Header />
+      <Header user={user} onShowProfile={() => setShowUserProfile(true)} />
       <Navigation currentView={currentView} onViewChange={setCurrentView} />
 
       {error && (
@@ -193,7 +189,20 @@ function App() {
 
       {/* PWA Installer */}
       <PWAInstaller />
+
+      {/* User Profile Modal */}
+      {showUserProfile && (
+        <UserProfile onClose={() => setShowUserProfile(false)} />
+      )}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

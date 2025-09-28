@@ -54,8 +54,9 @@ const spitSchema = new mongoose.Schema({
     default: Date.now
   },
   user: {
-    type: String,
-    default: 'anonymous' // For now, we'll use anonymous users
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   },
   isSummarized: {
     type: Boolean,
@@ -79,9 +80,9 @@ spitSchema.virtual('formattedDate').get(function () {
 spitSchema.set('toJSON', { virtuals: true });
 
 // Static method to get unsummarized spits for a user
-spitSchema.statics.getUnsummarizedSpits = function (user = 'anonymous', limit = 50) {
+spitSchema.statics.getUnsummarizedSpits = function (userId, limit = 50) {
   return this.find({
-    user,
+    user: userId,
     isSummarized: false
   })
     .sort({ timestamp: -1 })
@@ -90,9 +91,9 @@ spitSchema.statics.getUnsummarizedSpits = function (user = 'anonymous', limit = 
 };
 
 // Static method to get unsummarized spits count
-spitSchema.statics.getUnsummarizedSpitsCount = function (user = 'anonymous') {
+spitSchema.statics.getUnsummarizedSpitsCount = function (userId) {
   return this.countDocuments({
-    user,
+    user: userId,
     isSummarized: false
   });
 };
